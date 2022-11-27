@@ -1,5 +1,5 @@
-#ifndef DEFINIONS_H
-#define DEFINIONS_H
+#ifndef DEFINITIONS_H
+#define DEFINITIONS_H
 
 void monte_carlo(void);
 

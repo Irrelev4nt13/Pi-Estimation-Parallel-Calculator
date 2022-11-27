@@ -1,11 +1,14 @@
 #pragma once
+#include "definitions.h"
 
-void monte_carlo()
+void monte_carlo(void)
 {
     int arrows = 0;
     // βέλη_κύκλου = 0;
     for (int i = 0; i < 1; i++)
     {
+        double x = (rand() % (1 - (-1) + 1)) - 1;
+        print("%f\n", x);
     }
     // for (ρίψη = 0; ρίψη < πλήθος_ρίψεων; ρίψη++)
     // {
