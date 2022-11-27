@@ -1,7 +1,7 @@
 --- To-Do ---
 
 - 2 φοιτητες
-- linux13.di.uoa.gr
+- linux19.di.uoa.gr
 - Makefile
 - script (bash/python?)
 - report PDF
