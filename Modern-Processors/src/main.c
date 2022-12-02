@@ -9,7 +9,7 @@
 #include <sys/syscall.h>
 
 int thread_count;
-
+pthread_barrier_t barrier1;
 #define GET_TIME(now)                           \
     {                                           \
         struct timeval t;                       \
@@ -21,6 +21,7 @@ long long int throws;
 
 void *Hello(void *rank)
 {
+    int rc;
     long my_rank = (long)rank;
     printf("%ld\n", my_rank);
     if (my_rank == 0)
@@ -28,13 +29,14 @@ void *Hello(void *rank)
         double start, end;
         GET_TIME(start);
         long long int arrows;
-        arrows = monte_carlo(throws);
+        long double pi = monte_carlo(throws);
         GET_TIME(end);
         double duration = end - start;
-        long double pi = 4 * arrows / ((long double)throws);
         printf("%Lf\n", pi);
         printf("Time: %f\n", duration);
     }
+    pthread_barrier_wait(&barrier1);
+    printf("Ok from %ld\n", my_rank);
     return NULL;
 }
 
@@ -51,6 +53,7 @@ int main(int argc, char **argv)
     throws = strtoll(argv[1], NULL, 10);
     thread_count = strtol(argv[2], NULL, 10);
     thread_id = malloc(thread_count * sizeof(pthread_t));
+    pthread_barrier_init(&barrier1, NULL, thread_count);
     printf("Hello World from master thread\n");
     for (long thread = 0; thread < thread_count; thread++)
         pthread_create(&thread_id[thread], NULL, Hello, (void *)thread);
