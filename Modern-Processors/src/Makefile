@@ -1,19 +1,19 @@
 #Compiler
-CC=g++ 
+CC=gcc
 
 #.cpp files
-Files=main.cpp functions.cpp
+Files=main.c ../modules/monte_carlo.c
 #.o Files
-OBJS=main.o functions.o
+OBJS=main.o ../modules/monte_carlo.o
 
 #Executable
 EXEC=exe
 
 #Parameters for run
-ARGS=3 12 12 6
+ARGS=1000000 12 12 6
 
 #input file
-INPUT= < em.txt
+INPUT= 
 
 #Create executable
 $(EXEC):$(OBJS)

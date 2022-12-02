@@ -1,22 +1,16 @@
-#pragma once
-#include "definitions.h"
+#include <stdlib.h>
+#include <stdbool.h>
 
-void monte_carlo(void)
+long long int montecarlo(long long int throws)
 {
-    int arrows = 0;
-    // βέλη_κύκλου = 0;
-    for (int i = 0; i < 1; i++)
+    long long int arrows;
+    for (int i = 0; i < throws; i++)
     {
-        double x = (rand() % (1 - (-1) + 1)) - 1;
-        print("%f\n", x);
+        long double x = -1 + 2 * ((double)rand()) / RAND_MAX;
+        long double y = -1 + 2 * ((double)rand()) / RAND_MAX;
+        double distance = x * x + y * y;
+        if (distance <= 1)
+            arrows++;
     }
-    // for (ρίψη = 0; ρίψη < πλήθος_ρίψεων; ρίψη++)
-    // {
-    //     x = τυχαίος double μεταξύ −1 και 1;
-    //     y = τυχαίος double μεταξύ −1 και 1;
-    //     τετράγωνο_απόστασης = x * x + y * y;
-    //     if (τετράγωνο_απόστασης <= 1)
-    //         βέλη_κύκλου++;
-    // }
-    // εκτίμηση_π = 4 * βέλη_κύκλου / ((double)πλήθος_ρίψεων);
+    return arrows;
 }

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <sys/time.h>
+#include "../include/monte_carlo.h"
 
 #define GET_TIME(now)                           \
     {                                           \
@@ -23,18 +24,11 @@ int main(int argc, char **argv)
     long long int throws = atoll(argv[1]);
     long long int arrows = 0;
     GET_TIME(start);
-    for (int i = 0; i < throws; i++)
-    {
-        long double x = -1 + 2 * ((double)rand()) / RAND_MAX;
-        long double y = -1 + 2 * ((double)rand()) / RAND_MAX;
-        double distance = x * x + y * y;
-        if (distance <= 1)
-            arrows++;
-    }
+    arrows = montecarlo(throws);
     long double pi = 4 * arrows / ((long double)throws);
     GET_TIME(end);
     double duration = end - start;
     printf("%Lf\n", pi);
-    printf("Time: %f", duration);
+    printf("Time: %f\n", duration);
     return EXIT_SUCCESS;
 }
