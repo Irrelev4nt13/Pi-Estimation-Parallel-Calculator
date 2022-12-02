@@ -10,14 +10,14 @@ OBJS=main.o ../modules/monte_carlo.o
 EXEC=exe
 
 #Parameters for run
-ARGS=1000000 12 12 6
+ARGS= 100000000 3
 
 #input file
 INPUT= 
 
 #Create executable
 $(EXEC):$(OBJS)
-	$(CC) $(OBJS) -o $(EXEC)
+	$(CC) -g -Wall $(OBJS) -o $(EXEC) -lpthread 
 
 #Run
 run: $(EXEC)
