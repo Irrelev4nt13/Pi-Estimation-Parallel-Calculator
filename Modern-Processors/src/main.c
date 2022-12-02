@@ -28,13 +28,17 @@ void *Hello(void *rank)
     {
         double start, end;
         GET_TIME(start);
-        long long int arrows;
-        long double pi = monte_carlo(throws);
+
+        long long int arrows = monte_carlo(throws);
+        long double pi = 4 * arrows / ((long double)throws);
+
         GET_TIME(end);
         double duration = end - start;
+
         printf("%Lf\n", pi);
         printf("Time: %f\n", duration);
     }
+
     pthread_barrier_wait(&barrier1);
     printf("Ok from %ld\n", my_rank);
     return NULL;
@@ -58,16 +62,18 @@ int main(int argc, char **argv)
     for (long thread = 0; thread < thread_count; thread++)
         pthread_create(&thread_id[thread], NULL, Hello, (void *)thread);
 
+    printf("Hello\n");
     for (long thread = 0; thread < thread_count; thread++)
         pthread_join(thread_id[thread], NULL);
+
     // GET_TIME(start);
-    // long long int arrows = 0;
-    // arrows = monte_carlo(throws);
+    // long long int arrows = monte_carlo(throws);
+    // long double pi = 4 * arrows / ((long double)throws);
     // GET_TIME(end);
     // double duration = end - start;
-    // long double pi = 4 * arrows / ((long double)throws);
     // printf("%Lf\n", pi);
     // printf("Time: %f\n", duration);
+
     free(thread_id);
     return EXIT_SUCCESS;
 }
