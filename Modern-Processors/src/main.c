@@ -39,9 +39,10 @@ void *Hello(void *rank)
         if (distance <= 1)
             my_arrows++;
     }
-    printf("Ok from %ld\n", my_rank);
+    // printf("Ok from %ld\n", my_rank);
     pthread_mutex_lock(&mutex1);
     arrows += my_arrows;
+    // printf("%lld \n",arrows);
     pthread_mutex_unlock(&mutex1);
     // long double pi = 4 * arrows / ((long double)throws);
 
@@ -68,8 +69,9 @@ int main(int argc, char **argv)
     }
     throws = strtoll(argv[1], NULL, 10);
     GET_TIME(start);
-    long long int arrows = monte_carlo(throws);
-    long double pi = 4 * arrows / ((long double)throws);
+    long long int arrows1 = monte_carlo(throws);
+    printf("%lld \n",arrows);
+    long double pi = 4 * arrows1 / ((long double)throws);
     GET_TIME(end);
     double duration = end - start;
     printf("%Lf \n", pi);
@@ -80,6 +82,7 @@ int main(int argc, char **argv)
     thread_id = malloc(thread_count * sizeof(pthread_t));
     // pthread_barrier_init(&barrier1, NULL, thread_count);
     printf("Hello World from master thread\n");
+    // arrows=0;
 
     GET_TIME(start);
     for (long thread = 0; thread < thread_count; thread++)
@@ -87,10 +90,10 @@ int main(int argc, char **argv)
 
     for (long thread = 0; thread < thread_count; thread++)
         pthread_join(thread_id[thread], NULL);
-
     // GET_TIME(start);
     // long long int arrows = monte_carlo(throws);
     pi = 4 * arrows / ((long double)throws);
+    pthread_mutex_destroy(&mutex1);
     // GET_TIME(end);
     GET_TIME(end);
     duration = end - start;
