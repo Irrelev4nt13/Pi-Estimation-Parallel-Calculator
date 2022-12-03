@@ -85,7 +85,6 @@ int main(int argc, char **argv)
     for (long thread = 0; thread < thread_count; thread++)
         pthread_create(&thread_id[thread], NULL, Hello, (void *)thread);
 
-    printf("Hello\n");
     for (long thread = 0; thread < thread_count; thread++)
         pthread_join(thread_id[thread], NULL);
 
