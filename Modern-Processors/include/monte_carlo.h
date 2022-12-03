@@ -1,1 +1,1 @@
-long long int monte_carlo(long long int throws);
+long long int monte_carlo(long long int,long long int);

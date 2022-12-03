@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include "../include/my_rand.h"
 
-long long int monte_carlo(long long int throws)
+long long int monte_carlo(long long int throws,long long int start)
 {
     unsigned seed = 1, tmp;
-    long long int arrows1 = 0;
+    long long int arrows1 = 0,i;
     long double x, y;
     tmp = my_rand(&seed);
-    for (int i = 0; i < throws; i++)
+    for (i =start; i < throws; i++)
     {
         tmp = my_rand(&tmp);
         x = my_drand(&tmp);

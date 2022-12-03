@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include "../include/monte_carlo.h"
 #include "../include/my_rand.h"
@@ -11,27 +12,17 @@ pthread_mutex_t mutex;
 int thread_count;
 long long int throws;
 long long int arrows = 0;
-void *Hello(void *rank)
+void *monte_carlo_parallel(void *rank)
 {
     long my_rank = (long)rank;
     long long int seg = throws / thread_count, my_arrows = 0, i;
     long long int first_throw = my_rank * seg, last_throw = (my_rank + 1) * seg;
 
-    unsigned tmp, seed = 1;
-    long double x, y;
-    tmp = my_rand(&seed);
-    for (i = first_throw; i < last_throw; i++)
-    {
-        tmp = my_rand(&tmp);
-        x = my_drand(&tmp);
-        y = my_drand(&tmp);
-        long double distance = x * x + y * y;
-        if (distance <= 1)
-            my_arrows++;
-    }
+    my_arrows=monte_carlo(last_throw,first_throw);
     pthread_mutex_lock(&mutex);
     arrows += my_arrows;
     pthread_mutex_unlock(&mutex);
+
     return NULL;
 }
 
@@ -47,7 +38,7 @@ int main(int argc, char **argv)
     throws = strtoll(argv[1], NULL, 10);
 
     GET_TIME(start);
-    long long int arrows1 = monte_carlo(throws);
+    long long int arrows1 = monte_carlo(throws,0);
     long double pi = 4 * arrows1 / ((long double)throws);
     GET_TIME(end);
     double duration = end - start;
@@ -60,10 +51,18 @@ int main(int argc, char **argv)
 
     GET_TIME(start);
     for (long thread = 0; thread < thread_count; thread++)
-        pthread_create(&thread_id[thread], NULL, Hello, (void *)thread);
+        if(pthread_create(&thread_id[thread], NULL, monte_carlo_parallel, (void *)thread)!=0)
+            {
+                perror("Failed to create thread\n");
+                return EXIT_FAILURE;
+            }
 
     for (long thread = 0; thread < thread_count; thread++)
-        pthread_join(thread_id[thread], NULL);
+        if(pthread_join(thread_id[thread], NULL)!=0)
+            {
+                perror("Failed to create thread\n");
+                return EXIT_FAILURE;
+            }
         
     pi = 4 * arrows / ((long double)throws);
     GET_TIME(end);
