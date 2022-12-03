@@ -10,7 +10,7 @@ OBJS=main.o ../modules/monte_carlo.o
 EXEC=exe
 
 #Parameters for run
-ARGS= 1000000000 6
+ARGS= 100000000 6
 
 #input file
 INPUT= 

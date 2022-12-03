@@ -1,18 +1,40 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
+#define _MY_RAND_H_
+#define MR_MULTIPLIER 279470273
+#define MR_INCREMENT 0
+#define MR_MODULUS 4294967291U
+#define MR_DIVISOR ((double)4294967291U)
+unsigned my_rand(unsigned* seed_p) {
+   long long z = *seed_p;
+   z *= MR_MULTIPLIER; 
+// z += MR_INCREMENT;
+   z %= MR_MODULUS;
+   *seed_p = z;
+   return *seed_p;
+}
+
+long double my_drand(unsigned* seed_p) {
+   unsigned x = my_rand(seed_p);
+   long double y = -1 + 2 * x / MR_DIVISOR;
+   return y;
+}
+
 long long int monte_carlo(long long int throws)
 {
-    long long int arrows=0;
+    unsigned seed=1,tmp;
+    long long int arrows1=0;
+    long double x,y;
+    tmp=my_rand(&seed);
     for (int i = 0; i < throws; i++)
     {
-        long double x = -1 + 2 * ((double)rand()) / RAND_MAX;
-        long double y = -1 + 2 * ((double)rand()) / RAND_MAX;
-        double distance = x * x + y * y;
+        tmp=my_rand(&tmp);
+        x=my_drand(&tmp);
+        y=my_drand(&tmp);
+        long double distance = x * x + y * y;
         if (distance <= 1)
-            arrows++;
+            arrows1++;
     }
-    // long double pi = 4 * arrows / ((long double)throws);
-    // printf("%lld\n", arrows);
-    return arrows;
+    return arrows1;
 }

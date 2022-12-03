@@ -27,33 +27,23 @@ void *Hello(void *rank)
     long long int seg = throws / thread_count, my_arrows = 0, i;
     long long int first_throw = my_rank * seg, last_throw = (my_rank + 1) * seg;
     printf("Greetings from %ld start=%lld and end=%lld\n",my_rank,first_throw,last_throw);
-    // if (my_rank == 0)
-    // {
-    // double start, end;
-    // GET_TIME(start);
+
+    unsigned tmp,seed=1;
+    long double x,y;
+    tmp=my_rand(&seed);
     for (i = first_throw; i < last_throw; i++)
     {
-        long double x = -1 + 2 * ((double)rand()) / RAND_MAX;
-        long double y = -1 + 2 * ((double)rand()) / RAND_MAX;
-        double distance = x * x + y * y;
+        tmp=my_rand(&tmp);
+        x=my_drand(&tmp);
+        y=my_drand(&tmp);
+        long double distance = x * x + y * y;
         if (distance <= 1)
             my_arrows++;
     }
     // printf("Ok from %ld\n", my_rank);
     pthread_mutex_lock(&mutex1);
     arrows += my_arrows;
-    // printf("%lld \n",arrows);
     pthread_mutex_unlock(&mutex1);
-    // long double pi = 4 * arrows / ((long double)throws);
-
-    // GET_TIME(end);
-    // double duration = end - start;
-
-    // printf("%Lf\n", pi);
-    // printf("Time: %f\n", duration);
-    // }
-
-    // pthread_barrier_wait(&barrier1);
     return NULL;
 }
 
@@ -67,10 +57,11 @@ int main(int argc, char **argv)
         printf("Not enough arguments\n");
         return 1;
     }
+
     throws = strtoll(argv[1], NULL, 10);
     GET_TIME(start);
     long long int arrows1 = monte_carlo(throws);
-    printf("%lld \n",arrows);
+    printf("%lld \n",arrows1);
     long double pi = 4 * arrows1 / ((long double)throws);
     GET_TIME(end);
     double duration = end - start;
