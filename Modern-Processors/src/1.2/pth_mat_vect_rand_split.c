@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
    while (thread_count <= 0 || (m % thread_count) != 0)
    {
       printf("m %% thread_count != 0. Give a different number of threads: ");
-      if (scanf("%d", &thread_count) != 0)
+      if (scanf("%d", &thread_count) == 0)
       {
          perror("Invalid imput characters\n");
          return EXIT_FAILURE;
