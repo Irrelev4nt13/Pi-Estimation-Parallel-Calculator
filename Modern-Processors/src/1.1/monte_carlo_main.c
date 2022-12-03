@@ -32,8 +32,8 @@ int main(int argc, char **argv)
     pthread_t *thread_id;
     if (argc < 3)
     {
-        printf("Not enough arguments\n");
-        return 1;
+        perror("Not enouh arguments\n");
+        return EXIT_FAILURE;
     }
     throws = strtoll(argv[1], NULL, 10);
 
