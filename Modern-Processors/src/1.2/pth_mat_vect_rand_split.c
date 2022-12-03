@@ -218,32 +218,22 @@ void *Pth_mat_vect(void *rank)
    printf("Thread %ld > local_m = %d, sub = %d\n",
           my_rank, local_m, sub);
 #endif
-   // printf("%d %d\n", my_first_row, my_last_row);
-   // exit(0);
    double *local = malloc((my_last_row - my_first_row) * sizeof(double));
    GET_TIME(start);
-   // for (i = my_first_row; i < my_last_row; i++)
    for (i = 0; i < (my_last_row - my_first_row); i++)
    {
       local[i] = 0.0;
-      // y[i] = 0.0;
       for (j = 0; j < n; j++)
       {
          temp = A[sub++];
          temp *= x[j];
          local[i] += temp;
-         // y[i] += temp;
       }
    }
    for (int j = 0; j < (my_last_row - my_first_row); j++)
-   {
-      // pthread_mutex_lock(&mutex_local);
       y[j + my_first_row] = local[j];
-      // pthread_mutex_unlock(&mutex_local);
-   }
    GET_TIME(finish);
-   printf("Thread %ld > Elapsed time = %e seconds\n",
-          my_rank, finish - start);
+   printf("Thread %ld > Elapsed time = %e seconds\n", my_rank, finish - start);
 
    return NULL;
 } /* Pth_mat_vect */
