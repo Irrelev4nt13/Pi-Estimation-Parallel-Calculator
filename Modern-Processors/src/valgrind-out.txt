@@ -1,0 +1,120 @@
+==9242== Memcheck, a memory error detector
+==9242== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==9242== Using Valgrind-3.15.0-608cb11914-20190413 and LibVEX; rerun with -h for copyright info
+==9242== Command: ./exe 10000000 12
+==9242== Parent PID: 9240
+==9242== 
+--9242-- 
+--9242-- Valgrind options:
+--9242--    --leak-check=full
+--9242--    -s
+--9242--    --leak-check=full
+--9242--    --show-leak-kinds=all
+--9242--    --track-origins=yes
+--9242--    --verbose
+--9242--    --log-file=valgrind-out.txt
+--9242-- Contents of /proc/version:
+--9242--   Linux version 4.4.0-19041-Microsoft (Microsoft@Microsoft.com) (gcc version 5.4.0 (GCC) ) #1237-Microsoft Sat Sep 11 14:32:00 PST 2021
+--9242-- 
+--9242-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand
+--9242-- Page sizes: currently 4096, max supported 4096
+--9242-- Valgrind library directory: /usr/lib/x86_64-linux-gnu/valgrind
+--9242-- Reading syms from /mnt/c/Users/Κοστασ/Documents/c_programs/Parallel_Systems/Modern-Processors/src/exe
+--9242-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-2.31.so
+--9242--   Considering /usr/lib/x86_64-linux-gnu/ld-2.31.so ..
+--9242--   .. CRC mismatch (computed 975d0390 wanted 30bd717f)
+--9242--   Considering /lib/x86_64-linux-gnu/ld-2.31.so ..
+--9242--   .. CRC mismatch (computed 975d0390 wanted 30bd717f)
+--9242--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.31.so ..
+--9242--   .. CRC is valid
+--9242-- Reading syms from /usr/lib/x86_64-linux-gnu/valgrind/memcheck-amd64-linux
+--9242--    object doesn't have a symbol table
+--9242--    object doesn't have a dynamic symbol table
+--9242-- Scheduler: using generic scheduler lock implementation.
+--9242-- Reading suppressions file: /usr/lib/x86_64-linux-gnu/valgrind/default.supp
+==9242== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-9242-by-kanellam-on-???
+==9242== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-9242-by-kanellam-on-???
+==9242== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-9242-by-kanellam-on-???
+==9242== 
+==9242== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==9242== don't want to do, unless you know exactly what you're doing,
+==9242== or are doing some strange experiment):
+==9242==   /usr/lib/x86_64-linux-gnu/valgrind/../../bin/vgdb --pid=9242 ...command...
+==9242== 
+==9242== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==9242==   /path/to/gdb ./exe
+==9242== and then give GDB the following command
+==9242==   target remote | /usr/lib/x86_64-linux-gnu/valgrind/../../bin/vgdb --pid=9242
+==9242== --pid is optional if only one valgrind process is running
+==9242== 
+==9242== error calling PR_SET_PTRACER, vgdb might block
+--9242-- REDIR: 0x4022e10 (ld-linux-x86-64.so.2:strlen) redirected to 0x580c9ce2 (???)
+--9242-- REDIR: 0x4022be0 (ld-linux-x86-64.so.2:index) redirected to 0x580c9cfc (???)
+--9242-- Reading syms from /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_core-amd64-linux.so
+--9242--    object doesn't have a symbol table
+--9242-- Reading syms from /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so
+--9242--    object doesn't have a symbol table
+==9242== WARNING: new redirection conflicts with existing -- ignoring it
+--9242--     old: 0x04022e10 (strlen              ) R-> (0000.0) 0x580c9ce2 ???
+--9242--     new: 0x04022e10 (strlen              ) R-> (2007.0) 0x0483f060 strlen
+--9242-- REDIR: 0x401f5f0 (ld-linux-x86-64.so.2:strcmp) redirected to 0x483ffd0 (strcmp)
+--9242-- REDIR: 0x4023370 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4843a20 (mempcpy)
+--9242-- Reading syms from /usr/lib/x86_64-linux-gnu/libpthread-2.31.so
+--9242--   Considering /usr/lib/debug/.build-id/e5/4761f7b554d0fcc1562959665d93dffbebdaf0.debug ..
+--9242--   .. build-id is valid
+--9242-- Reading syms from /usr/lib/x86_64-linux-gnu/libc-2.31.so
+--9242--   Considering /usr/lib/x86_64-linux-gnu/libc-2.31.so ..
+--9242--   .. CRC mismatch (computed 86b78530 wanted e380f01c)
+--9242--   Considering /lib/x86_64-linux-gnu/libc-2.31.so ..
+--9242--   .. CRC mismatch (computed 86b78530 wanted e380f01c)
+--9242--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.31.so ..
+--9242--   .. CRC is valid
+--9242-- REDIR: 0x4919600 (libc.so.6:memmove) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4918900 (libc.so.6:strncpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4919930 (libc.so.6:strcasecmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4918220 (libc.so.6:strcat) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4918960 (libc.so.6:rindex) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x491add0 (libc.so.6:rawmemchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4935e60 (libc.so.6:wmemchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49359a0 (libc.so.6:wcscmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4919760 (libc.so.6:mempcpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4919590 (libc.so.6:bcmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4918890 (libc.so.6:strncmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49182d0 (libc.so.6:strcmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49196c0 (libc.so.6:memset) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4935960 (libc.so.6:wcschr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49187f0 (libc.so.6:strnlen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49183b0 (libc.so.6:strcspn) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4919980 (libc.so.6:strncasecmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4918350 (libc.so.6:strcpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4919ad0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49370d0 (libc.so.6:wcsnlen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49359e0 (libc.so.6:wcscpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49189a0 (libc.so.6:strpbrk) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4918280 (libc.so.6:index) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49187b0 (libc.so.6:strlen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4921d20 (libc.so.6:memrchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49199d0 (libc.so.6:strcasecmp_l) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4919550 (libc.so.6:memchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4935ab0 (libc.so.6:wcslen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4918c60 (libc.so.6:strspn) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x49198d0 (libc.so.6:stpncpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4919870 (libc.so.6:stpcpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x491ae10 (libc.so.6:strchrnul) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4919a20 (libc.so.6:strncasecmp_l) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--9242-- REDIR: 0x4a01490 (libc.so.6:__strrchr_avx2) redirected to 0x483ea10 (rindex)
+--9242-- REDIR: 0x4a012a0 (libc.so.6:__strchrnul_avx2) redirected to 0x4843540 (strchrnul)
+--9242-- REDIR: 0x4a01660 (libc.so.6:__strlen_avx2) redirected to 0x483ef40 (strlen)
+--9242-- REDIR: 0x4a04650 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4843660 (mempcpy)
+--9242-- REDIR: 0x4913260 (libc.so.6:malloc) redirected to 0x483b780 (malloc)
+--9242-- REDIR: 0x4a04670 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x48429f0 (memmove)
+--9242-- REDIR: 0x4914c90 (libc.so.6:calloc) redirected to 0x483dce0 (calloc)
+--9242-- REDIR: 0x4913850 (libc.so.6:free) redirected to 0x483c9d0 (free)
+==9242== 
+==9242== HEAP SUMMARY:
+==9242==     in use at exit: 0 bytes in 0 blocks
+==9242==   total heap usage: 14 allocs, 14 frees, 4,384 bytes allocated
+==9242== 
+==9242== All heap blocks were freed -- no leaks are possible
+==9242== 
+==9242== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

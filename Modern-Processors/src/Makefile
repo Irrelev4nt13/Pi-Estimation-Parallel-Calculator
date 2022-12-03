@@ -2,15 +2,15 @@
 CC=gcc
 
 #.cpp files
-Files=main.c ../modules/monte_carlo.c
+Files=main.c ../modules/monte_carlo.c ../modules/my_rand.c 
 #.o Files
-OBJS=main.o ../modules/monte_carlo.o
+OBJS=main.o ../modules/monte_carlo.o ../modules/my_rand.o
 
 #Executable
 EXEC=exe
 
 #Parameters for run
-ARGS= 1000000000 12
+ARGS= 10000000 12
 
 #input file
 INPUT= 
@@ -25,20 +25,18 @@ run: $(EXEC)
 
 #debug
 debug: 
-	$(CC) -g3 $(Files) -o $(EXEC) 
+	$(CC) -g3 $(Files) -o $(EXEC)
 	gdb -q $(EXEC)
 
 #memory-loss
-memory:
-	make
-	valgrind --leak-check=full -s ./$(EXEC) $(ARGS) $(INPUT)
-#--leak-check=full \
+valgrind: $(EXEC)
+	valgrind --leak-check=full -s \
+	--leak-check=full \
          --show-leak-kinds=all \
          --track-origins=yes \
          --verbose \
-         --log-file=valgrind-out.txt \
-		 ./executable exampleParam1 \
-https://stackoverflow.com/questions/5134891/how-do-i-use-valgrind-to-find-memory-leaks 
+		  ./$(EXEC) $(ARGS) $(INPUT)
+#https://stackoverflow.com/questions/5134891/how-do-i-use-valgrind-to-find-memory-leaks 
 
 #Clear
 clean:
