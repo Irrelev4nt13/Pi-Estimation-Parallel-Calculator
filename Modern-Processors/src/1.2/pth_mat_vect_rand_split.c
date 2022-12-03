@@ -45,6 +45,8 @@ double *A;
 double *x;
 double *y;
 
+pthread_mutex_t mutex_local;
+
 /* Serial functions */
 void Usage(char *prog_name);
 void Gen_matrix(double A[], int m, int n);
@@ -62,7 +64,7 @@ int main(int argc, char *argv[])
 {
    long thread;
    pthread_t *thread_handles;
-
+   pthread_mutex_init(&mutex_local, NULL);
    if (argc != 4)
       Usage(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
@@ -113,7 +115,7 @@ int main(int argc, char *argv[])
 #ifdef DEBUG
    Print_vector("The product is", y, m);
 #endif
-
+   pthread_mutex_destroy(&mutex_local);
    free(A);
    free(x);
    free(y);
@@ -216,17 +218,28 @@ void *Pth_mat_vect(void *rank)
    printf("Thread %ld > local_m = %d, sub = %d\n",
           my_rank, local_m, sub);
 #endif
-
+   // printf("%d %d\n", my_first_row, my_last_row);
+   // exit(0);
+   double *local = malloc((my_last_row - my_first_row) * sizeof(double));
    GET_TIME(start);
-   for (i = my_first_row; i < my_last_row; i++)
+   // for (i = my_first_row; i < my_last_row; i++)
+   for (i = 0; i < (my_last_row - my_first_row); i++)
    {
-      y[i] = 0.0;
+      local[i] = 0.0;
+      // y[i] = 0.0;
       for (j = 0; j < n; j++)
       {
          temp = A[sub++];
          temp *= x[j];
-         y[i] += temp;
+         local[i] += temp;
+         // y[i] += temp;
       }
+   }
+   for (int j = 0; j < (my_last_row - my_first_row); j++)
+   {
+      // pthread_mutex_lock(&mutex_local);
+      y[j + my_first_row] = local[j];
+      // pthread_mutex_unlock(&mutex_local);
    }
    GET_TIME(finish);
    printf("Thread %ld > Elapsed time = %e seconds\n",

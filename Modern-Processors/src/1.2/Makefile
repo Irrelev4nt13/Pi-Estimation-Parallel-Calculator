@@ -10,7 +10,7 @@ OBJS=pth_mat_vect_rand_split.o ../../modules/monte_carlo.o ../../modules/my_rand
 EXEC=exe
 
 #Parameters for run
-ARGS= 40 8 150
+ARGS= 4 8000 8000
 
 #input file
 INPUT= 
