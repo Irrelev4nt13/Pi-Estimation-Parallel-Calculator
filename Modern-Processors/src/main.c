@@ -19,28 +19,40 @@ pthread_barrier_t barrier1;
 
 long long int throws;
 
+pthread_mutex_t mutex1;
+long long int arrows = 0;
 void *Hello(void *rank)
 {
-    int rc;
     long my_rank = (long)rank;
-    printf("%ld\n", my_rank);
-    if (my_rank == 0)
+    long long int seg = throws / thread_count, my_arrows = 0, i;
+    long long int first_throw = my_rank * seg, last_throw = (my_rank + 1) * seg;
+    printf("Greetings from %ld start=%lld and end=%lld\n",my_rank,first_throw,last_throw);
+    // if (my_rank == 0)
+    // {
+    // double start, end;
+    // GET_TIME(start);
+    for (i = first_throw; i < last_throw; i++)
     {
-        double start, end;
-        GET_TIME(start);
-
-        long long int arrows = monte_carlo(throws);
-        long double pi = 4 * arrows / ((long double)throws);
-
-        GET_TIME(end);
-        double duration = end - start;
-
-        printf("%Lf\n", pi);
-        printf("Time: %f\n", duration);
+        long double x = -1 + 2 * ((double)rand()) / RAND_MAX;
+        long double y = -1 + 2 * ((double)rand()) / RAND_MAX;
+        double distance = x * x + y * y;
+        if (distance <= 1)
+            my_arrows++;
     }
-
-    pthread_barrier_wait(&barrier1);
     printf("Ok from %ld\n", my_rank);
+    pthread_mutex_lock(&mutex1);
+    arrows += my_arrows;
+    pthread_mutex_unlock(&mutex1);
+    // long double pi = 4 * arrows / ((long double)throws);
+
+    // GET_TIME(end);
+    // double duration = end - start;
+
+    // printf("%Lf\n", pi);
+    // printf("Time: %f\n", duration);
+    // }
+
+    // pthread_barrier_wait(&barrier1);
     return NULL;
 }
 
@@ -55,10 +67,21 @@ int main(int argc, char **argv)
         return 1;
     }
     throws = strtoll(argv[1], NULL, 10);
+    GET_TIME(start);
+    long long int arrows = monte_carlo(throws);
+    long double pi = 4 * arrows / ((long double)throws);
+    GET_TIME(end);
+    double duration = end - start;
+    printf("%Lf \n", pi);
+    printf("Time: %f\n", duration);
+
+    pthread_mutex_init(&mutex1, NULL);
     thread_count = strtol(argv[2], NULL, 10);
     thread_id = malloc(thread_count * sizeof(pthread_t));
-    pthread_barrier_init(&barrier1, NULL, thread_count);
+    // pthread_barrier_init(&barrier1, NULL, thread_count);
     printf("Hello World from master thread\n");
+
+    GET_TIME(start);
     for (long thread = 0; thread < thread_count; thread++)
         pthread_create(&thread_id[thread], NULL, Hello, (void *)thread);
 
@@ -68,11 +91,13 @@ int main(int argc, char **argv)
 
     // GET_TIME(start);
     // long long int arrows = monte_carlo(throws);
-    // long double pi = 4 * arrows / ((long double)throws);
+    pi = 4 * arrows / ((long double)throws);
     // GET_TIME(end);
-    // double duration = end - start;
-    // printf("%Lf\n", pi);
-    // printf("Time: %f\n", duration);
+    GET_TIME(end);
+    duration = end - start;
+    printf("%Lf \n", pi);
+
+    printf("Time: %f\n", duration);
 
     free(thread_id);
     return EXIT_SUCCESS;
