@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include "../include/timer.h"
+#include "../../include/timer.h"
 
 /* Global variables */
 int thread_count;

@@ -3,9 +3,9 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#include "../include/monte_carlo.h"
-#include "../include/my_rand.h"
-#include "../include/timer.h"
+#include "../../include/monte_carlo.h"
+#include "../../include/my_rand.h"
+#include "../../include/timer.h"
 
 pthread_mutex_t mutex;
 

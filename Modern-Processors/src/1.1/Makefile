@@ -2,9 +2,9 @@
 CC=gcc
 
 #.cpp files
-Files=monte_carlo_main.c ../modules/monte_carlo.c ../modules/my_rand.c 
+Files=monte_carlo_main.c ../../modules/monte_carlo.c ../../modules/my_rand.c 
 #.o Files
-OBJS=monte_carlo_main.o ../modules/monte_carlo.o ../modules/my_rand.o
+OBJS=monte_carlo_main.o ../../modules/monte_carlo.o ../../modules/my_rand.o
 
 #Executable
 EXEC=exe
