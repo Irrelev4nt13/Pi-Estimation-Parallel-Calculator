@@ -18,7 +18,7 @@ void *monte_carlo_parallel(void *rank)
     long long int seg = throws / thread_count, my_arrows = 0, i;
     long long int first_throw = my_rank * seg, last_throw = (my_rank + 1) * seg;
 
-    my_arrows=monte_carlo(last_throw,first_throw);
+    my_arrows = monte_carlo(last_throw, first_throw);
     pthread_mutex_lock(&mutex);
     arrows += my_arrows;
     pthread_mutex_unlock(&mutex);
@@ -38,12 +38,12 @@ int main(int argc, char **argv)
     throws = strtoll(argv[1], NULL, 10);
 
     GET_TIME(start);
-    long long int arrows1 = monte_carlo(throws,0);
+    long long int arrows1 = monte_carlo(throws, 0);
     long double pi = 4 * arrows1 / ((long double)throws);
     GET_TIME(end);
     double duration = end - start;
     printf("%Lf \n", pi);
-    printf("Time: %f\n", duration);
+    printf("Time duration for serial code: %f\n", duration);
 
     pthread_mutex_init(&mutex, NULL);
     thread_count = strtol(argv[2], NULL, 10);
@@ -51,24 +51,24 @@ int main(int argc, char **argv)
 
     GET_TIME(start);
     for (long thread = 0; thread < thread_count; thread++)
-        if(pthread_create(&thread_id[thread], NULL, monte_carlo_parallel, (void *)thread)!=0)
-            {
-                perror("Failed to create thread\n");
-                return EXIT_FAILURE;
-            }
+        if (pthread_create(&thread_id[thread], NULL, monte_carlo_parallel, (void *)thread) != 0)
+        {
+            perror("Failed to create thread\n");
+            return EXIT_FAILURE;
+        }
 
     for (long thread = 0; thread < thread_count; thread++)
-        if(pthread_join(thread_id[thread], NULL)!=0)
-            {
-                perror("Failed to create thread\n");
-                return EXIT_FAILURE;
-            }
-        
+        if (pthread_join(thread_id[thread], NULL) != 0)
+        {
+            perror("Failed to create thread\n");
+            return EXIT_FAILURE;
+        }
+
     pi = 4 * arrows / ((long double)throws);
     GET_TIME(end);
     duration = end - start;
     printf("%Lf \n", pi);
-    printf("Time: %f\n", duration);
+    printf("Time duration for parallel code: %f\n", duration);
 
     pthread_mutex_destroy(&mutex);
     free(thread_id);
