@@ -2,9 +2,9 @@
 CC=gcc
 
 #.cpp files
-Files=pth_mat_vect_rand_split.c ../../modules/monte_carlo.c ../../modules/my_rand.c 
+Files=pth_mat_vect_rand_split_1.c
 #.o Files
-OBJS=pth_mat_vect_rand_split.o ../../modules/monte_carlo.o ../../modules/my_rand.o
+OBJS=pth_mat_vect_rand_split_1.o
 
 #Executable
 EXEC=exe2
