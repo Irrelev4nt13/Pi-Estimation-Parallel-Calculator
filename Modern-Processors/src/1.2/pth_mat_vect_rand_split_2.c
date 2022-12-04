@@ -80,12 +80,6 @@ int main(int argc, char *argv[])
       }
    }
    n = strtol(argv[3], NULL, 10);
-   int cache_line = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-   if (cache_line == -1)
-   {
-      perror("Couldn't get cache line length\n");
-      return EXIT_FAILURE;
-   }
 
 #ifdef DEBUG
    printf("thread_count =  %d, m = %d, n = %d\n", thread_count, m, n);
@@ -228,24 +222,17 @@ void *Pth_mat_vect(void *rank)
    printf("Thread %ld > local_m = %d, sub = %d\n",
           my_rank, local_m, sub);
 #endif
-   double *local = malloc((my_last_row - my_first_row) * sizeof(double));
    GET_TIME(start);
    for (i = 0; i < (my_last_row - my_first_row); i++)
    {
-      local[i] = 0.0;
       for (j = 0; j < n; j++)
       {
          temp = A[sub++];
          temp *= x[j];
-         // local[i] += temp;
          sum += temp;
       }
       y[i] += sum;
    }
-
-   // for (int j = 0; j < (my_last_row - my_first_row); j++)
-   // y[j + my_first_row] = local[j];
-
    GET_TIME(finish);
    printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
 
