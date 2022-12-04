@@ -10,7 +10,7 @@ OBJS=pth_mat_vect_rand_split.o ../../modules/monte_carlo.o ../../modules/my_rand
 EXEC=exe
 
 #Parameters for run
-ARGS= 5 8000 8000
+ARGS= 5 8000000 8
 
 #input file
 INPUT= 
@@ -21,7 +21,7 @@ $(EXEC):$(OBJS)
 
 #Run
 run: $(EXEC)
-	./$(EXEC) $(ARGS) $(INPUT) > em.txt
+	./$(EXEC) $(ARGS) $(INPUT)
 
 #debug
 debug: 
