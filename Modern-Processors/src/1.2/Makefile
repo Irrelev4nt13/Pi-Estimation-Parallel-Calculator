@@ -21,7 +21,7 @@ $(EXEC):$(OBJS)
 
 #Run
 run: $(EXEC)
-	./$(EXEC) $(ARGS) $(INPUT) > em.txt
+	./$(EXEC) $(ARGS) $(INPUT)
 
 #debug
 debug: 
