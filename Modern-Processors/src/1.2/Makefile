@@ -7,25 +7,25 @@ Files=pth_mat_vect_rand_split_1.c
 OBJS=pth_mat_vect_rand_split_1.o
 
 #Executable
-EXEC=exe2
+EXEC=exe
 
 #Parameters for run
-ARGS= 8 8 8000000 
+ARGS= 4 8000 8000
 
 #input file
 INPUT= 
 
 #Create executable
 $(EXEC):$(OBJS)
-	$(CC) -g -Wall $(OBJS) -o $(EXEC) -lpthread 
+	$(CC) -g -Wall $(OBJS) -o $(EXEC) -lpthread
 
 #Run
 run: $(EXEC)
-	./$(EXEC) $(ARGS) $(INPUT)
+	./$(EXEC) $(ARGS) $(INPUT) > em.txt
 
 #debug
 debug: 
-	$(CC) -g3 $(Files) -o $(EXEC)
+	$(CC) -g3 $(Files) -o $(EXEC) -lpthread 
 	gdb -q $(EXEC)
 
 #memory-loss

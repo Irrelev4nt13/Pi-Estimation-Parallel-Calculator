@@ -234,7 +234,7 @@ void *Pth_mat_vect(void *rank)
       y[i] += sum;
    }
    GET_TIME(finish);
-   printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
+   printf("Thread %ld > Elapsed time = %e seconds\n", my_rank, finish - start);
 
    return NULL;
 } /* Pth_mat_vect */
