@@ -79,9 +79,9 @@ int main(int argc, char *argv[])
    y = malloc(m * sizeof(double));
 
    Gen_matrix(A, m, n);
-   // #ifdef DEBUG
-   //    Print_matrix("We generated", A, m, n);
-   // #endif
+#ifdef DEBUG
+   Print_matrix("We generated", A, m, n);
+#endif
 
    Gen_vector(x, n);
 #ifdef DEBUG
@@ -97,8 +97,8 @@ int main(int argc, char *argv[])
    for (thread = 0; thread < thread_count; thread++)
       pthread_join(thread_handles[thread], NULL);
 
-   // Print_vector("MAKAROS", y, m);
-   // Print_vector("The product is", y, m);
+      // Print_vector("MAKAROS", y, m);
+      // Print_vector("The product is", y, m);
 #ifdef DEBUG
 #endif
 

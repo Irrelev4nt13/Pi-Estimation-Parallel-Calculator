@@ -15,7 +15,7 @@
  * Output:
  *     y: the product vector
  *     Elapsed time for the computation
- **
+ *
  * Compile:
  *    gcc -g -Wall -o pth_mat_vect_rand pth_mat_vect_rand.c -lpthread
  * Usage:
@@ -36,10 +36,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include "timer.h"
+#include <unistd.h>
+#include "../../include/timer.h"
 
 /* Global variables */
 int thread_count;
+int cache_line;
 int m, n;
 double *A;
 double *x;
@@ -53,7 +55,7 @@ void Gen_vector(double x[], int n);
 void Read_vector(char *prompt, double x[], int n);
 void Print_matrix(char *title, double A[], int m, int n);
 void Print_vector(char *title, double y[], double m);
-
+int pad;
 /* Parallel function */
 void *Pth_mat_vect(void *rank);
 
@@ -62,21 +64,40 @@ int main(int argc, char *argv[])
 {
    long thread;
    pthread_t *thread_handles;
-
    if (argc != 4)
       Usage(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
    m = strtol(argv[2], NULL, 10);
+   while (thread_count <= 0 || (m % thread_count) != 0)
+   {
+      printf("m %% thread_count != 0. Give a different number of threads: ");
+      if (scanf("%d", &thread_count) == 0)
+      {
+         perror("Invalid imput characters\n");
+         return EXIT_FAILURE;
+      }
+   }
    n = strtol(argv[3], NULL, 10);
+   cache_line = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+   if (cache_line == -1)
+   {
+      perror("Couldn't get cache line length\n");
+      return EXIT_FAILURE;
+   }
 
 #ifdef DEBUG
    printf("thread_count =  %d, m = %d, n = %d\n", thread_count, m, n);
 #endif
 
    thread_handles = malloc(thread_count * sizeof(pthread_t));
-   A = malloc(m * n * sizeof(double));
+   int pad_el = cache_line / sizeof(double);
+   pad = abs(pad_el - (m / thread_count) % pad_el);
+   // printf("%d\n", pad);
+   // exit(0);
+   // y = malloc((pad * thread_count + m) * sizeof(double));
+   y = malloc((8 * thread_count + (m + 8)));
    x = malloc(n * sizeof(double));
-   y = malloc(m * sizeof(double));
+   A = malloc(m * n * sizeof(double));
 
    Gen_matrix(A, m, n);
 #ifdef DEBUG
@@ -88,24 +109,26 @@ int main(int argc, char *argv[])
    Print_vector("We generated", x, n);
 #endif
 
-   double start, finish;
-   GET_TIME(start);
    for (thread = 0; thread < thread_count; thread++)
-      pthread_create(&thread_handles[thread], NULL,
-                     Pth_mat_vect, (void *)thread);
-
+      if (pthread_create(&thread_handles[thread], NULL, Pth_mat_vect, (void *)thread) != 0)
+      {
+         perror("Failed to create thread\n");
+         return EXIT_FAILURE;
+      }
    for (thread = 0; thread < thread_count; thread++)
-      pthread_join(thread_handles[thread], NULL);
-
-      // Print_vector("MAKAROS", y, m);
-      // Print_vector("The product is", y, m);
+      if (pthread_join(thread_handles[thread], NULL) != 0)
+      {
+         perror("Thread failed to finish execution\n");
+         return EXIT_FAILURE;
+      }
+      // Print_vector("The product is", y, m + pad);
 #ifdef DEBUG
+   Print_vector("The product is", y, m);
 #endif
-
    free(A);
    free(x);
    free(y);
-
+   free(thread_handles);
    return 0;
 } /* main */
 
@@ -199,21 +222,19 @@ void *Pth_mat_vect(void *rank)
    register int sub = my_first_row * n;
    double start, finish;
    double temp;
-
 #ifdef DEBUG
    printf("Thread %ld > local_m = %d, sub = %d\n",
           my_rank, local_m, sub);
 #endif
-
    GET_TIME(start);
    for (i = my_first_row; i < my_last_row; i++)
    {
-      y[i] = 0.0;
+      y[i + pad * my_rank] = 0.0;
       for (j = 0; j < n; j++)
       {
          temp = A[sub++];
          temp *= x[j];
-         y[i] += temp;
+         y[i + pad * my_rank] += temp;
       }
    }
    GET_TIME(finish);
@@ -247,10 +268,17 @@ void Print_matrix(char *title, double A[], int m, int n)
  */
 void Print_vector(char *title, double y[], double m)
 {
-   int i;
+   int i, counter = 1;
 
    printf("%s\n", title);
    for (i = 0; i < m; i++)
+   {
+      /* if (i == (pad * counter))
+      {
+         i += (pad % thread_count);
+         counter++;
+      } */
       printf("%6.3f\n", y[i]);
+   }
    printf("\n");
 } /* Print_vector */
