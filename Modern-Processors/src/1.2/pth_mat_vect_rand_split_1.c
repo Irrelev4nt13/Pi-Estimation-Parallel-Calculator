@@ -32,18 +32,25 @@
  *     5.  Compile with -DDEBUG for information on generated data
  *         and product.
  */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include "timer.h"
-
+#include <unistd.h>
+#include "../../include/timer.h"
+struct afs
+{
+   double val;
+   char pad[64 - sizeof(double)];
+}; // avoid false sharing
+typedef struct afs *ptr;
+#define NUM_ITERATIONS (1L << 32)
 /* Global variables */
 int thread_count;
+int cache_line;
 int m, n;
 double *A;
 double *x;
-double *y;
+ptr y;
 
 /* Serial functions */
 void Usage(char *prog_name);
@@ -52,7 +59,7 @@ void Read_matrix(char *prompt, double A[], int m, int n);
 void Gen_vector(double x[], int n);
 void Read_vector(char *prompt, double x[], int n);
 void Print_matrix(char *title, double A[], int m, int n);
-void Print_vector(char *title, double y[], double m);
+void Print_vector(char *title, ptr y, double m);
 
 /* Parallel function */
 void *Pth_mat_vect(void *rank);
@@ -73,11 +80,11 @@ int main(int argc, char *argv[])
    printf("thread_count =  %d, m = %d, n = %d\n", thread_count, m, n);
 #endif
 
+   cache_line = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
    thread_handles = malloc(thread_count * sizeof(pthread_t));
    A = malloc(m * n * sizeof(double));
    x = malloc(n * sizeof(double));
-   y = malloc(m * sizeof(double));
-
+   y = malloc(m * sizeof(struct afs));
    Gen_matrix(A, m, n);
 #ifdef DEBUG
    Print_matrix("We generated", A, m, n);
@@ -88,8 +95,6 @@ int main(int argc, char *argv[])
    Print_vector("We generated", x, n);
 #endif
 
-   double start, finish;
-   GET_TIME(start);
    for (thread = 0; thread < thread_count; thread++)
       pthread_create(&thread_handles[thread], NULL,
                      Pth_mat_vect, (void *)thread);
@@ -97,8 +102,8 @@ int main(int argc, char *argv[])
    for (thread = 0; thread < thread_count; thread++)
       pthread_join(thread_handles[thread], NULL);
 
-      // Print_vector("MAKAROS", y, m);
-      // Print_vector("The product is", y, m);
+   // Print_vector("MAKAROS", y, m);
+   Print_vector("The product is", y, m);
 #ifdef DEBUG
 #endif
 
@@ -208,16 +213,16 @@ void *Pth_mat_vect(void *rank)
    GET_TIME(start);
    for (i = my_first_row; i < my_last_row; i++)
    {
-      y[i] = 0.0;
+      y[i].val = 0.0;
       for (j = 0; j < n; j++)
       {
          temp = A[sub++];
          temp *= x[j];
-         y[i] += temp;
+         y[i].val += temp;
       }
    }
    GET_TIME(finish);
-   printf("Thread %ld > Elapsed time = %e seconds\n", my_rank, finish - start);
+   printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
 
    return NULL;
 } /* Pth_mat_vect */
@@ -245,12 +250,12 @@ void Print_matrix(char *title, double A[], int m, int n)
  * Purpose:     Print a vector
  * In args:     title, y, m
  */
-void Print_vector(char *title, double y[], double m)
+void Print_vector(char *title, ptr y, double m)
 {
    int i;
 
    printf("%s\n", title);
    for (i = 0; i < m; i++)
-      printf("%6.3f\n", y[i]);
+      printf("%6.3f\n", y[i].val);
    printf("\n");
 } /* Print_vector */

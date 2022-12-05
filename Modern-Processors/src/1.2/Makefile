@@ -10,7 +10,7 @@ OBJS=pth_mat_vect_rand_split_1.o
 EXEC=exe
 
 #Parameters for run
-ARGS= 4 8000 8000
+ARGS= 4 8 8000000
 
 #input file
 INPUT= 
@@ -21,7 +21,7 @@ $(EXEC):$(OBJS)
 
 #Run
 run: $(EXEC)
-	./$(EXEC) $(ARGS) $(INPUT)
+	./$(EXEC) $(ARGS) $(INPUT) > em.txt
 
 #debug
 debug: 
