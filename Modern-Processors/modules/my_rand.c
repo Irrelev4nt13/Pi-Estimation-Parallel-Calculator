@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "my_rand.h"
+#include "../include/my_rand.h"
 
 #define MR_MULTIPLIER 279470273
 #define MR_INCREMENT 0

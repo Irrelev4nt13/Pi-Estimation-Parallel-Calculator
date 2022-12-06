@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../include/my_rand.h"
-#include "monte_carlo.h"
+#include "../include/monte_carlo.h"
 
 long long int monte_carlo(long long int throws, long long int start)
 {
