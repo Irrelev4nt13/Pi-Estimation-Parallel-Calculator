@@ -1,2 +1,2 @@
 #pragma once
-long long int monte_carlo(long long int, long long int);
+long long int monte_carlo(long long int, long long int, int);

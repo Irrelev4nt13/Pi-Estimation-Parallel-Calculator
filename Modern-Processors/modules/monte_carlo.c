@@ -3,9 +3,9 @@
 #include "../include/my_rand.h"
 #include "../include/monte_carlo.h"
 
-long long int monte_carlo(long long int throws, long long int start)
+long long int monte_carlo(long long int throws, long long int start, int id)
 {
-    unsigned seed = 1, tmp;
+    unsigned seed = id, tmp;
     long long int my_arrows = 0, i;
     long double x, y;
     tmp = my_rand(&seed);

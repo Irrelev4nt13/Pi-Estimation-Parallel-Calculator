@@ -18,7 +18,7 @@ void *monte_carlo_parallel(void *rank)
     long long int seg = throws / thread_count, my_arrows = 0, i;
     long long int first_throw = my_rank * seg, last_throw = (my_rank + 1) * seg;
 
-    my_arrows = monte_carlo(last_throw, first_throw);
+    my_arrows = monte_carlo(last_throw, first_throw, my_rank + 1);
     pthread_mutex_lock(&mutex);
     arrows += my_arrows;
     pthread_mutex_unlock(&mutex);
@@ -38,14 +38,15 @@ int main(int argc, char **argv)
     throws = strtoll(argv[1], NULL, 10);
 
     GET_TIME(start);
-    long long int arrows1 = monte_carlo(throws, 0);
+    long long int arrows1 = monte_carlo(throws, 0, 1);
     long double pi = 4 * arrows1 / ((long double)throws);
+    printf("%Lf\n", pi);
     GET_TIME(end);
     double duration = end - start;
 
     printf("%Lf %f\n", pi, duration);
     fprintf(stderr, "Time duration for serial code: %f\n", duration);
-    
+
     pthread_mutex_init(&mutex, NULL);
     thread_count = strtol(argv[2], NULL, 10);
     thread_id = malloc(thread_count * sizeof(pthread_t));
