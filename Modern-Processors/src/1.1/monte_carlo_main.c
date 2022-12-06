@@ -42,9 +42,10 @@ int main(int argc, char **argv)
     long double pi = 4 * arrows1 / ((long double)throws);
     GET_TIME(end);
     double duration = end - start;
-    printf("%Lf \n", pi);
-    printf("Time duration for serial code: %f\n", duration);
 
+    printf("%Lf %f\n", pi, duration);
+    fprintf(stderr, "Time duration for serial code: %f\n", duration);
+    
     pthread_mutex_init(&mutex, NULL);
     thread_count = strtol(argv[2], NULL, 10);
     thread_id = malloc(thread_count * sizeof(pthread_t));
@@ -67,9 +68,8 @@ int main(int argc, char **argv)
     pi = 4 * arrows / ((long double)throws);
     GET_TIME(end);
     duration = end - start;
-    printf("%Lf \n", pi);
-    printf("Time duration for parallel code: %f\n", duration);
-
+    printf("%Lf %f\n", pi, duration);
+    fprintf(stderr, "Time duration for parallel code: %f\n", duration);
     pthread_mutex_destroy(&mutex);
     free(thread_id);
     return EXIT_SUCCESS;
