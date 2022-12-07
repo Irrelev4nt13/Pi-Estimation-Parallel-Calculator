@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     GET_TIME(start);
     long long int arrows1 = monte_carlo(throws, 0, 1);
     long double pi = 4 * arrows1 / ((long double)throws);
-    printf("%Lf\n", pi);
+    // printf("%Lf\n", pi);
     GET_TIME(end);
     double duration = end - start;
 
