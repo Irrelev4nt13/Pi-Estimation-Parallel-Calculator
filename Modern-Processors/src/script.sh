@@ -61,12 +61,6 @@ do
             done
             (( counter++ ))
         done <"$FILE"
-
-        # for i in {0..3}
-        # do
-        #     echo ${values[i]}
-        # done
-
         for i in {0..3}
         do
             IFS='.'
@@ -74,10 +68,6 @@ do
             IFS=" "
             values[i]=$( echo "scale=6; ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
         done
-        # for i in {0..3}
-        # do
-        #     echo ${values[i]}
-        # done
         echo $throws $thread_num ${values[@]} >> ${NEW_FILE}
         throws=$(( $throws + $throws_step ))
     done
