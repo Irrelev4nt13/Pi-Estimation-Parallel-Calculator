@@ -37,12 +37,14 @@ int main(int argc, char **argv)
     }
     throws = strtoll(argv[1], NULL, 10);
 
-    GET_TIME(start);
-    long long int arrows1 = monte_carlo(throws, 0, 1);
-    long double pi = 4 * arrows1 / ((long double)throws);
-    GET_TIME(end);
-    double duration = end - start;
-    printf("%Lf %f\n", pi, duration);
+    // GET_TIME(start);
+    // long long int arrows1 = monte_carlo(throws, 0, 1);
+    // long double pi = 4 * arrows1 / ((long double)throws);
+    long double pi;
+    // GET_TIME(end);
+    // double duration = end - start;
+    double duration;
+    // printf("%Lf %f\n", pi, duration);
 
     pthread_mutex_init(&mutex, NULL);
     thread_count = strtol(argv[2], NULL, 10);
