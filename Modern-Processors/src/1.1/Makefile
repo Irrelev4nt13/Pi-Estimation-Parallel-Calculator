@@ -10,7 +10,7 @@ OBJS=monte_carlo_main.o ../../modules/monte_carlo.o ../../modules/my_rand.o
 EXEC=exe
 
 #Parameters for run
-ARGS= 100000000 4
+ARGS= 10000000 4
 
 #input file
 INPUT= 
@@ -21,7 +21,7 @@ $(EXEC):$(OBJS)
 
 #Run
 run: $(EXEC)
-	./$(EXEC) $(ARGS) $(INPUT) > em.txt
+	./$(EXEC) $(ARGS) $(INPUT)
 
 #debug
 debug: 
