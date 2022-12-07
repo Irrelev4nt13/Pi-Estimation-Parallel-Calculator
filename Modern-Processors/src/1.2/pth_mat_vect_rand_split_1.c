@@ -41,7 +41,7 @@ struct afs
 {
    double val;
    char pad[64 - sizeof(double)];
-}; // avoid false sharing
+} __attribute__((aligned(64)));; // avoid false sharing
 typedef struct afs *ptr;
 #define NUM_ITERATIONS (1L << 32)
 /* Global variables */

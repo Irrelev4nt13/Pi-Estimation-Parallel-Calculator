@@ -46,6 +46,7 @@ int m, n;
 double *A;
 double *x;
 double *y;
+int pad;
 
 /* Serial functions */
 void Usage(char *prog_name);
@@ -55,7 +56,6 @@ void Gen_vector(double x[], int n);
 void Read_vector(char *prompt, double x[], int n);
 void Print_matrix(char *title, double A[], int m, int n);
 void Print_vector(char *title, double y[], double m);
-int pad;
 /* Parallel function */
 void *Pth_mat_vect(void *rank);
 
@@ -95,7 +95,10 @@ int main(int argc, char *argv[])
    // printf("%d\n", pad);
    // exit(0);
    // y = malloc((pad * thread_count + m) * sizeof(double));
-   y = malloc((8 * thread_count + (m + 8)));
+   // y = malloc((8 * thread_count + (m + 8)));
+   y=malloc(m*sizeof(double)+(cache_line*thread_count*sizeof(char)));
+   printf("%ld\n",m*sizeof(double)+(cache_line*thread_count*sizeof(char)));
+   // exit(0);
    x = malloc(n * sizeof(double));
    A = malloc(m * n * sizeof(double));
 
@@ -108,6 +111,8 @@ int main(int argc, char *argv[])
 #ifdef DEBUG
    Print_vector("We generated", x, n);
 #endif
+   double start, end, duration;
+   GET_TIME(start);
    for (thread = 0; thread < thread_count; thread++)
       if (pthread_create(&thread_handles[thread], NULL, Pth_mat_vect, (void *)thread) != 0)
       {
@@ -120,7 +125,10 @@ int main(int argc, char *argv[])
          perror("Thread failed to finish execution\n");
          return EXIT_FAILURE;
       }
-   // Print_vector("The product is", y, m + pad);
+   GET_TIME(end);
+   duration = end - start;
+   printf("Elapsed time %f\n", duration);
+   // Print_vector("The product is", y, m );
 #ifdef DEBUG
    Print_vector("The product is", y, m);
 #endif
@@ -226,14 +234,15 @@ void *Pth_mat_vect(void *rank)
           my_rank, local_m, sub);
 #endif
    GET_TIME(start);
-   for (i = my_first_row; i < my_last_row; i++)
+      
+   for (i = my_first_row+8*my_rank; i < my_last_row+8*my_rank; i++)
    {
-      y[i + pad * my_rank] = 0.0;
+      y[i] = 0.0;
       for (j = 0; j < n; j++)
       {
          temp = A[sub++];
          temp *= x[j];
-         y[i + pad * my_rank] += temp;
+         y[i ] += temp;
       }
    }
    GET_TIME(finish);
@@ -270,7 +279,7 @@ void Print_vector(char *title, double y[], double m)
    int i, counter = 1;
 
    printf("%s\n", title);
-   for (i = 0; i < m; i++)
+   for (i = 0; i < m+32; i++)
    {
       /* if (i == (pad * counter))
       {

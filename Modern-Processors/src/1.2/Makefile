@@ -2,9 +2,9 @@
 CC=gcc
 
 #.cpp files
-Files=pth_mat_vect_rand_split_1.c
+Files=pth_mat_vect_rand_split_2.c
 #.o Files
-OBJS=pth_mat_vect_rand_split_1.o
+OBJS=pth_mat_vect_rand_split_2.o
 
 #Executable
 EXEC=exe
