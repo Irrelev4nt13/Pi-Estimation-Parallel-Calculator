@@ -2,15 +2,15 @@
 CC=gcc
 
 #.cpp files
-Files=pth_mat_vect_rand_split_1.c
+Files=pth_mat_vect_rand_split_2.c
 #.o Files
-OBJS=pth_mat_vect_rand_split_1.o
+OBJS=pth_mat_vect_rand_split_2.o
 
 #Executable
 EXEC=exe
 
 #Parameters for run
-ARGS= 4 8 8000000
+ARGS= 4 8000000 8
 
 #input file
 INPUT= 
@@ -21,7 +21,7 @@ $(EXEC):$(OBJS)
 
 #Run
 run: $(EXEC)
-	./$(EXEC) $(ARGS) $(INPUT) > em.txt
+	./$(EXEC) $(ARGS) $(INPUT)
 
 #debug
 debug: 
