@@ -108,7 +108,6 @@ int main(int argc, char *argv[])
 #ifdef DEBUG
    Print_vector("We generated", x, n);
 #endif
-
    for (thread = 0; thread < thread_count; thread++)
       if (pthread_create(&thread_handles[thread], NULL, Pth_mat_vect, (void *)thread) != 0)
       {
@@ -121,7 +120,7 @@ int main(int argc, char *argv[])
          perror("Thread failed to finish execution\n");
          return EXIT_FAILURE;
       }
-      // Print_vector("The product is", y, m + pad);
+   // Print_vector("The product is", y, m + pad);
 #ifdef DEBUG
    Print_vector("The product is", y, m);
 #endif

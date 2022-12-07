@@ -95,6 +95,8 @@ int main(int argc, char *argv[])
    Print_vector("We generated", x, n);
 #endif
 
+   double start, end, duration;
+   GET_TIME(start);
    for (thread = 0; thread < thread_count; thread++)
       pthread_create(&thread_handles[thread], NULL,
                      Pth_mat_vect, (void *)thread);
@@ -102,8 +104,11 @@ int main(int argc, char *argv[])
    for (thread = 0; thread < thread_count; thread++)
       pthread_join(thread_handles[thread], NULL);
 
+   GET_TIME(end);
+   duration = end - start;
+   printf("Elapsed time %f\n", duration);
    // Print_vector("MAKAROS", y, m);
-   Print_vector("The product is", y, m);
+   // Print_vector("The product is", y, m);
 #ifdef DEBUG
 #endif
 
@@ -210,7 +215,7 @@ void *Pth_mat_vect(void *rank)
           my_rank, local_m, sub);
 #endif
 
-   GET_TIME(start);
+   // GET_TIME(start);
    for (i = my_first_row; i < my_last_row; i++)
    {
       y[i].val = 0.0;
@@ -221,8 +226,8 @@ void *Pth_mat_vect(void *rank)
          y[i].val += temp;
       }
    }
-   GET_TIME(finish);
-   printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
+   // GET_TIME(finish);
+   // printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
 
    return NULL;
 } /* Pth_mat_vect */
