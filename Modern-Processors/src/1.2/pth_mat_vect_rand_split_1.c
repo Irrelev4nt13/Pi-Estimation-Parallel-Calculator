@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
    thread_handles = malloc(thread_count * sizeof(pthread_t));
    A = malloc(m * n * sizeof(double));
    x = malloc(n * sizeof(double));
+   printf("%ld\n", sizeof(struct afs));
    y = malloc(m * sizeof(struct afs));
    Gen_matrix(A, m, n);
 #ifdef DEBUG
