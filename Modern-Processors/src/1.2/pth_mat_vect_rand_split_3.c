@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
       }
    GET_TIME(end);
    duration = end - start;
-   printf("Elapsed time %f\n", duration);
+   printf("%f\n", duration);
    // Print_vector("The product is", y, m );
 #ifdef DEBUG
    Print_vector("The product is", y, m);
@@ -237,11 +237,11 @@ void *Pth_mat_vect(void *rank)
       {
          temp = A[sub++];
          temp *= x[j];
-         y[i ] += temp;
+         y[i] += temp;
       }
    }
-   GET_TIME(finish);
-   printf("Thread %d > Elapsed time = %e seconds\n", cache_line/sizeof(double), finish - start);
+   // GET_TIME(finish);
+   // printf("Thread %ld > Elapsed time = %e seconds\n", my_rank, finish - start);
 
    return NULL;
 } /* Pth_mat_vect */
@@ -274,7 +274,7 @@ void Print_vector(char *title, double y[], double m)
    int i, counter = 1;
 
    printf("%s\n", title);
-   for (i = 0; i < m+32; i++)
+   for (i = 0; i < m + 32; i++)
    {
       /* if (i == (pad * counter))
       {
