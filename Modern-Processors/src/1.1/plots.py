@@ -11,7 +11,7 @@ thread[0] = 'Serial'
 rows = 1
 cols = 0
 pic = [[0 for i in range(m)] for j in range(n)]
-with open('average8.txt', 'r') as file:
+with open('averages.txt', 'r') as file:
     for line in file:
         str = line.split()
         if len(str) == 0:

@@ -4,11 +4,12 @@ import pandas as pd
 (rows, cols, i) = (n, m, z) = (4, 3, 4)
 values = ["8000000*8", "8000*8000", "8*8000000", "8*80000000"]
 thread = [0 for k in range(rows)]
-appp = [[[0 for iol in range(i)] for col in range(rows)] for row in range(cols)]
+appp = [[[0 for iol in range(i)] for col in range(rows)]
+        for row in range(cols)]
 cols = 0
 rows = 0
 i = 0
-with open('app2ch.txt', 'r') as file:
+with open('output.txt', 'r') as file:
     for line in file:
         str1 = line.split()
         if len(str1) == 0:
