@@ -231,8 +231,12 @@ void *Pth_mat_vect(void *rank)
          temp *= x[j];
          sum += temp;
       }
-      y[i] += sum;
+      // y[i] += sum;
    }
+   
+   for (i = 0; i < (my_last_row - my_first_row); i++)
+      y[i] += sum;
+   
    // GET_TIME(finish);
    // printf("Thread %ld > Elapsed time = %e seconds\n", my_rank, finish - start);
 
