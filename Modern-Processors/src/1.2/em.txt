@@ -1,6 +1,0 @@
-64000256
-Thread 0 > Elapsed time = 6.162691e-02 seconds
-Thread 2 > Elapsed time = 6.159401e-02 seconds
-Thread 1 > Elapsed time = 6.196904e-02 seconds
-Thread 3 > Elapsed time = 6.151509e-02 seconds
-Elapsed time 0.065699

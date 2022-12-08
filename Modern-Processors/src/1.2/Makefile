@@ -2,15 +2,15 @@
 CC=gcc
 
 #.cpp files
-Files=pth_mat_vect_rand_split_2.c
+Files=pth_mat_vect_rand_split_1.c
 #.o Files
-OBJS=pth_mat_vect_rand_split_2.o
+OBJS=pth_mat_vect_rand_split_1.o
 
 #Executable
 EXEC=exe
 
 #Parameters for run
-ARGS= 4 8000000 8
+ARGS= 4 8000 8000
 
 #input file
 INPUT= 

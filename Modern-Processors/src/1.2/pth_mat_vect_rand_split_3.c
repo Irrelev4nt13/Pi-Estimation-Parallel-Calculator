@@ -91,14 +91,9 @@ int main(int argc, char *argv[])
 
    thread_handles = malloc(thread_count * sizeof(pthread_t));
    int pad_el = cache_line / sizeof(double);
-   pad = abs(pad_el - (m / thread_count) % pad_el);
-   // printf("%d\n", pad);
-   // exit(0);
-   // y = malloc((pad * thread_count + m) * sizeof(double));
-   // y = malloc((8 * thread_count + (m + 8)));
-   y=malloc(m*sizeof(double)+(cache_line*thread_count*sizeof(char)));
-   printf("%ld\n",m*sizeof(double)+(cache_line*thread_count*sizeof(char)));
-   // exit(0);
+   pad = cache_line*thread_count*sizeof(char);
+   y=malloc(m*sizeof(double)+pad);
+   printf("%ld\n",pad);
    x = malloc(n * sizeof(double));
    A = malloc(m * n * sizeof(double));
 
@@ -235,7 +230,7 @@ void *Pth_mat_vect(void *rank)
 #endif
    GET_TIME(start);
       
-   for (i = my_first_row+8*my_rank; i < my_last_row+8*my_rank; i++)
+   for (i = my_first_row+cache_line/sizeof(double)*my_rank; i < my_last_row+cache_line/sizeof(double)*my_rank; i++)
    {
       y[i] = 0.0;
       for (j = 0; j < n; j++)
@@ -246,7 +241,7 @@ void *Pth_mat_vect(void *rank)
       }
    }
    GET_TIME(finish);
-   printf("Thread %ld > Elapsed time = %e seconds\n", my_rank, finish - start);
+   printf("Thread %d > Elapsed time = %e seconds\n", cache_line/sizeof(double), finish - start);
 
    return NULL;
 } /* Pth_mat_vect */
