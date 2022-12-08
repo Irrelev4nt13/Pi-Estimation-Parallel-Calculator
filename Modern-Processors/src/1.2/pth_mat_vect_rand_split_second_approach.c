@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
       }
    GET_TIME(finish);
    printf("%f\n", finish - start);
-   Print_vector("The product is", y, m);
+   
 #ifdef DEBUG
    Print_vector("The product is", y, m);
 #endif

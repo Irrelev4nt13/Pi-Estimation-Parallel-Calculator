@@ -99,7 +99,6 @@ int main(int argc, char *argv[])
    GET_TIME(end);
    duration = end - start;
    printf("%f\n", duration);
-   Print_vector("We generated", y, m);
 
 #ifdef DEBUG
 #endif
