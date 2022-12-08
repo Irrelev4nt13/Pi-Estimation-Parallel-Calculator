@@ -10,7 +10,7 @@ echo "Running..."
 FILE="output.txt"
 rm -f ${FILE}
 touch ${FILE}
-for i in {1..4} 
+for k in {1..4} 
 do  
     declare -a values=(
         [0]=0
@@ -83,10 +83,10 @@ do
     echo "$thread_num 8 80000000 ${values[3]}" >> ${FILE}
 
     echo "$" >> ${FILE}
-    if [ $i == 2 ]
+    if [ $k == 2 ]
     then
         thread_num=$(( $thread_num + 2 ))
-    elif [ $i == 3 ]
+    elif [ $k == 3 ]
     then
         thread_num=$(( $thread_num + 4 ))
     else
