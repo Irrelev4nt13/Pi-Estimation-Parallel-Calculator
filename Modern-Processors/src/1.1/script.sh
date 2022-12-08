@@ -4,7 +4,6 @@ if [ $# != 2 ]
 then
     exit 
 fi
-cd 1.1
 make -s clean && make -s
 throws=$1
 throws_step=$throws
