@@ -15,7 +15,7 @@
  * Output:
  *     y: the product vector
  *     Elapsed time for the computation
- *
+ **
  * Compile:
  *    gcc -g -Wall -o pth_mat_vect_rand pth_mat_vect_rand.c -lpthread
  * Usage:
@@ -36,17 +36,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <unistd.h>
 #include "../../include/timer.h"
 
 /* Global variables */
 int thread_count;
-int cache_line;
 int m, n;
 double *A;
 double *x;
 double *y;
-int pad;
 
 /* Serial functions */
 void Usage(char *prog_name);
@@ -56,6 +53,7 @@ void Gen_vector(double x[], int n);
 void Read_vector(char *prompt, double x[], int n);
 void Print_matrix(char *title, double A[], int m, int n);
 void Print_vector(char *title, double y[], double m);
+
 /* Parallel function */
 void *Pth_mat_vect(void *rank);
 
@@ -64,39 +62,22 @@ int main(int argc, char *argv[])
 {
    long thread;
    pthread_t *thread_handles;
+
    if (argc != 4)
       Usage(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
    m = strtol(argv[2], NULL, 10);
-   while (thread_count <= 0 || (m % thread_count) != 0)
-   {
-      printf("m %% thread_count != 0. Give a different number of threads: ");
-      if (scanf("%d", &thread_count) == 0)
-      {
-         perror("Invalid imput characters\n");
-         return EXIT_FAILURE;
-      }
-   }
    n = strtol(argv[3], NULL, 10);
-   cache_line = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-   if (cache_line == -1)
-   {
-      perror("Couldn't get cache line length\n");
-      return EXIT_FAILURE;
-   }
 
 #ifdef DEBUG
    printf("thread_count =  %d, m = %d, n = %d\n", thread_count, m, n);
 #endif
 
    thread_handles = malloc(thread_count * sizeof(pthread_t));
-   int pad_el = cache_line / sizeof(double);
-   pad = cache_line*thread_count*sizeof(char);
-   y=malloc(m*sizeof(double)+pad);
-   // printf("%ld\n",pad);
-   x = malloc(n * sizeof(double));
    A = malloc(m * n * sizeof(double));
-   
+   x = malloc(n * sizeof(double));
+   y = malloc(m * sizeof(double));
+
    Gen_matrix(A, m, n);
 #ifdef DEBUG
    Print_matrix("We generated", A, m, n);
@@ -108,29 +89,26 @@ int main(int argc, char *argv[])
 #endif
    double start, end, duration;
    GET_TIME(start);
+
    for (thread = 0; thread < thread_count; thread++)
-      if (pthread_create(&thread_handles[thread], NULL, Pth_mat_vect, (void *)thread) != 0)
-      {
-         perror("Failed to create thread\n");
-         return EXIT_FAILURE;
-      }
+      pthread_create(&thread_handles[thread], NULL,
+                     Pth_mat_vect, (void *)thread);
+
    for (thread = 0; thread < thread_count; thread++)
-      if (pthread_join(thread_handles[thread], NULL) != 0)
-      {
-         perror("Thread failed to finish execution\n");
-         return EXIT_FAILURE;
-      }
+      pthread_join(thread_handles[thread], NULL);
    GET_TIME(end);
    duration = end - start;
    printf("%f\n", duration);
-   Print_vector("The product is", y, m );
+
+   // Print_vector("MAKAROS", y, m);
+   // Print_vector("The product is", y, m);
 #ifdef DEBUG
-   Print_vector("The product is", y, m);
 #endif
+
    free(A);
    free(x);
    free(y);
-   free(thread_handles);
+
    return 0;
 } /* main */
 
@@ -224,13 +202,14 @@ void *Pth_mat_vect(void *rank)
    register int sub = my_first_row * n;
    double start, finish;
    double temp;
+
 #ifdef DEBUG
    printf("Thread %ld > local_m = %d, sub = %d\n",
           my_rank, local_m, sub);
 #endif
+
    GET_TIME(start);
-      
-   for (i = my_first_row+8*my_rank; i < my_last_row+8*my_rank; i++)
+   for (i = my_first_row; i < my_last_row; i++)
    {
       y[i] = 0.0;
       for (j = 0; j < n; j++)
@@ -240,8 +219,8 @@ void *Pth_mat_vect(void *rank)
          y[i] += temp;
       }
    }
-   GET_TIME(finish);
-   printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
+   // GET_TIME(finish);
+   // printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
 
    return NULL;
 } /* Pth_mat_vect */
@@ -271,17 +250,10 @@ void Print_matrix(char *title, double A[], int m, int n)
  */
 void Print_vector(char *title, double y[], double m)
 {
-   int i, counter = 1;
+   int i;
 
    printf("%s\n", title);
-   for (i = 0; i < m + 32; i++)
-   {
-      /* if (i == (pad * counter))
-      {
-         i += (pad % thread_count);
-         counter++;
-      } */
+   for (i = 0; i < m; i++)
       printf("%6.3f\n", y[i]);
-   }
    printf("\n");
 } /* Print_vector */

@@ -15,7 +15,7 @@
  * Output:
  *     y: the product vector
  *     Elapsed time for the computation
- **
+ *
  * Compile:
  *    gcc -g -Wall -o pth_mat_vect_rand pth_mat_vect_rand.c -lpthread
  * Usage:
@@ -32,26 +32,21 @@
  *     5.  Compile with -DDEBUG for information on generated data
  *         and product.
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
 #include "../../include/timer.h"
-struct afs
-{
-   // char pad[64 - sizeof(double)];
-   double pad[7];
-   double val;
-}; // avoid false sharing
-typedef struct afs *ptr;
-#define NUM_ITERATIONS (1L << 32)
+
 /* Global variables */
 int thread_count;
-int cache_line;
 int m, n;
 double *A;
 double *x;
-ptr y;
+double *y;
+
+pthread_mutex_t mutex_local;
 
 /* Serial functions */
 void Usage(char *prog_name);
@@ -60,7 +55,7 @@ void Read_matrix(char *prompt, double A[], int m, int n);
 void Gen_vector(double x[], int n);
 void Read_vector(char *prompt, double x[], int n);
 void Print_matrix(char *title, double A[], int m, int n);
-void Print_vector(char *title, ptr y, double m);
+void Print_vector(char *title, double y[], double m);
 
 /* Parallel function */
 void *Pth_mat_vect(void *rank);
@@ -70,23 +65,31 @@ int main(int argc, char *argv[])
 {
    long thread;
    pthread_t *thread_handles;
-
+   pthread_mutex_init(&mutex_local, NULL);
    if (argc != 4)
       Usage(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
    m = strtol(argv[2], NULL, 10);
+   while (thread_count <= 0 || (m % thread_count) != 0)
+   {
+      printf("m %% thread_count != 0. Give a different number of threads: ");
+      if (scanf("%d", &thread_count) == 0)
+      {
+         perror("Invalid imput characters\n");
+         return EXIT_FAILURE;
+      }
+   }
    n = strtol(argv[3], NULL, 10);
 
 #ifdef DEBUG
    printf("thread_count =  %d, m = %d, n = %d\n", thread_count, m, n);
 #endif
 
-   cache_line = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
    thread_handles = malloc(thread_count * sizeof(pthread_t));
    A = malloc(m * n * sizeof(double));
    x = malloc(n * sizeof(double));
-   // printf("%ld\n", sizeof(struct afs));
-   y = malloc(m * sizeof(struct afs));
+   y = malloc(m * sizeof(double));
+
    Gen_matrix(A, m, n);
 #ifdef DEBUG
    Print_matrix("We generated", A, m, n);
@@ -97,27 +100,30 @@ int main(int argc, char *argv[])
    Print_vector("We generated", x, n);
 #endif
 
-   double start, end, duration;
+   double start, finish;
    GET_TIME(start);
    for (thread = 0; thread < thread_count; thread++)
-      pthread_create(&thread_handles[thread], NULL,
-                     Pth_mat_vect, (void *)thread);
-
+      if (pthread_create(&thread_handles[thread], NULL, Pth_mat_vect, (void *)thread) != 0)
+      {
+         perror("Failed to create thread\n");
+         return EXIT_FAILURE;
+      }
    for (thread = 0; thread < thread_count; thread++)
-      pthread_join(thread_handles[thread], NULL);
-
-   GET_TIME(end);
-   duration = end - start;
-   printf("Elapsed time %f\n", duration);
-   // Print_vector("MAKAROS", y, m);
-   // Print_vector("The product is", y, m);
+      if (pthread_join(thread_handles[thread], NULL) != 0)
+      {
+         perror("Thread failed to finish execution\n");
+         return EXIT_FAILURE;
+      }
+   GET_TIME(finish);
+   printf("%f\n", finish - start);
 #ifdef DEBUG
+   Print_vector("The product is", y, m);
 #endif
-
+   pthread_mutex_destroy(&mutex_local);
    free(A);
    free(x);
    free(y);
-
+   free(thread_handles);
    return 0;
 } /* main */
 
@@ -210,26 +216,25 @@ void *Pth_mat_vect(void *rank)
    int my_last_row = my_first_row + local_m;
    register int sub = my_first_row * n;
    double start, finish;
-   double temp;
+   double temp, sum;
 
 #ifdef DEBUG
    printf("Thread %ld > local_m = %d, sub = %d\n",
           my_rank, local_m, sub);
 #endif
-
    GET_TIME(start);
-   for (i = my_first_row; i < my_last_row; i++)
+   for (i = 0; i < (my_last_row - my_first_row); i++)
    {
-      y[i].val = 0.0;
       for (j = 0; j < n; j++)
       {
          temp = A[sub++];
          temp *= x[j];
-         y[i].val += temp;
+         sum += temp;
       }
+      y[i] += sum;
    }
-   GET_TIME(finish);
-   printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
+   // GET_TIME(finish);
+   // printf("Thread %ld > Elapsed time = %e seconds\n", my_rank, finish - start);
 
    return NULL;
 } /* Pth_mat_vect */
@@ -257,12 +262,12 @@ void Print_matrix(char *title, double A[], int m, int n)
  * Purpose:     Print a vector
  * In args:     title, y, m
  */
-void Print_vector(char *title, ptr y, double m)
+void Print_vector(char *title, double y[], double m)
 {
    int i;
 
    printf("%s\n", title);
    for (i = 0; i < m; i++)
-      printf("%6.3f\n", y[i].val);
+      printf("%6.3f ", y[i]);
    printf("\n");
 } /* Print_vector */

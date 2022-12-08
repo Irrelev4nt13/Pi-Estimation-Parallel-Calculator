@@ -5,7 +5,7 @@ then
     exit 
 fi
 cd 1.2
-make -s clean && make -s
+make -s clean && make all -s
 thread_num=$1
 echo "Running..."
 FILE="output.txt"
@@ -13,14 +13,21 @@ rm -f ${FILE}
 touch ${FILE}
 for i in {1..4} 
 do  
-    value=$(./exe $thread_num 8000000 8)
-    echo "$thread_num 8000000 8 $value" >> ${FILE}
-    value=$(./exe $thread_num 8000 8000)
-    echo "$thread_num 8000 8000 $value" >> ${FILE}
-    value=$(./exe $thread_num 8 8000000)
-    echo "$thread_num 8 8000000 $value" >> ${FILE}
-    value=$(./exe $thread_num 8 80000000)
-    echo "$thread_num 8 80000000 $value" >> ${FILE}
+    echo "$thread_num 8000000 8 $(./exe_o $thread_num 8000000 8)" >> ${FILE}
+    echo "$thread_num 8000 8000 $(./exe_o $thread_num 8000 8000)" >> ${FILE}
+    echo "$thread_num 8 8000000 $(./exe_o $thread_num 8 8000000)" >> ${FILE}
+    echo "$thread_num 8 80000000 $(./exe_o $thread_num 8 80000000)" >> ${FILE}
+    echo "#" >> ${FILE}
+    echo "$thread_num 8000000 8 $(./exe_1 $thread_num 8000000 8)" >> ${FILE}
+    echo "$thread_num 8000 8000 $(./exe_1 $thread_num 8000 8000)" >> ${FILE}
+    echo "$thread_num 8 8000000 $(./exe_1 $thread_num 8 8000000)" >> ${FILE}
+    echo "$thread_num 8 80000000 $(./exe_1 $thread_num 8 80000000)" >> ${FILE}
+    echo "#" >> ${FILE}
+    echo "$thread_num 8000000 8 $(./exe_2 $thread_num 8000000 8)" >> ${FILE}
+    echo "$thread_num 8000 8000 $(./exe_2 $thread_num 8000 8000)" >> ${FILE}
+    echo "$thread_num 8 8000000 $(./exe_2 $thread_num 8 8000000)" >> ${FILE}
+    echo "$thread_num 8 80000000 $(./exe_2 $thread_num 8 80000000)" >> ${FILE}
+    echo "$" >> ${FILE}
     if [ $i == 2 ]
     then
         thread_num=$(( $thread_num + 2 ))
@@ -30,6 +37,5 @@ do
     else
         thread_num=$(( $thread_num + 1 ))
     fi
-    echo "#" >> ${FILE}
 done
 make -s clean
