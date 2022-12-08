@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
          return EXIT_FAILURE;
       }
    GET_TIME(finish);
-   printf("%f\n", (finish - start) / (double)thread_count);
+   printf("%f\n", finish - start);
 #ifdef DEBUG
    Print_vector("The product is", y, m);
 #endif
@@ -234,7 +234,7 @@ void *Pth_mat_vect(void *rank)
       y[i] += sum;
    }
    GET_TIME(finish);
-   printf("Thread %ld > Elapsed time = %e seconds\n", my_rank, finish - start);
+   printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
 
    return NULL;
 } /* Pth_mat_vect */

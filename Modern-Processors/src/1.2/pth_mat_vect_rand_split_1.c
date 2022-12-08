@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
    thread_handles = malloc(thread_count * sizeof(pthread_t));
    A = malloc(m * n * sizeof(double));
    x = malloc(n * sizeof(double));
-   printf("%ld\n", sizeof(struct afs));
+   // printf("%ld\n", sizeof(struct afs));
    y = malloc(m * sizeof(struct afs));
    Gen_matrix(A, m, n);
 #ifdef DEBUG
@@ -216,7 +216,7 @@ void *Pth_mat_vect(void *rank)
           my_rank, local_m, sub);
 #endif
 
-   // GET_TIME(start);
+   GET_TIME(start);
    for (i = my_first_row; i < my_last_row; i++)
    {
       y[i].val = 0.0;
@@ -227,8 +227,8 @@ void *Pth_mat_vect(void *rank)
          y[i].val += temp;
       }
    }
-   // GET_TIME(finish);
-   // printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
+   GET_TIME(finish);
+   printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
 
    return NULL;
 } /* Pth_mat_vect */

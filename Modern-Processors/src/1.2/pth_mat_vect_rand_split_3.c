@@ -93,10 +93,10 @@ int main(int argc, char *argv[])
    int pad_el = cache_line / sizeof(double);
    pad = cache_line*thread_count*sizeof(char);
    y=malloc(m*sizeof(double)+pad);
-   printf("%ld\n",pad);
+   // printf("%ld\n",pad);
    x = malloc(n * sizeof(double));
    A = malloc(m * n * sizeof(double));
-
+   
    Gen_matrix(A, m, n);
 #ifdef DEBUG
    Print_matrix("We generated", A, m, n);
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
    GET_TIME(end);
    duration = end - start;
    printf("%f\n", duration);
-   // Print_vector("The product is", y, m );
+   Print_vector("The product is", y, m );
 #ifdef DEBUG
    Print_vector("The product is", y, m);
 #endif
@@ -230,7 +230,7 @@ void *Pth_mat_vect(void *rank)
 #endif
    GET_TIME(start);
       
-   for (i = my_first_row+cache_line/sizeof(double)*my_rank; i < my_last_row+cache_line/sizeof(double)*my_rank; i++)
+   for (i = my_first_row+8*my_rank; i < my_last_row+8*my_rank; i++)
    {
       y[i] = 0.0;
       for (j = 0; j < n; j++)
@@ -240,8 +240,8 @@ void *Pth_mat_vect(void *rank)
          y[i] += temp;
       }
    }
-   // GET_TIME(finish);
-   // printf("Thread %ld > Elapsed time = %e seconds\n", my_rank, finish - start);
+   GET_TIME(finish);
+   printf("Thread %ld > Elapsed time = %f seconds\n", my_rank, finish - start);
 
    return NULL;
 } /* Pth_mat_vect */
