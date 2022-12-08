@@ -46,7 +46,6 @@ int m, n;
 double *A;
 double *x;
 double *y;
-int pad;
 
 /* Serial functions */
 void Usage(char *prog_name);
@@ -90,9 +89,8 @@ int main(int argc, char *argv[])
 #endif
 
    thread_handles = malloc(thread_count * sizeof(pthread_t));
-   pad = cache_line * thread_count * sizeof(char);
+   int pad = cache_line * thread_count * sizeof(char);
    y = malloc(m * sizeof(double) + pad);
-   // printf("%ld\n",pad);
    x = malloc(n * sizeof(double));
    A = malloc(m * n * sizeof(double));
 
@@ -122,7 +120,6 @@ int main(int argc, char *argv[])
    GET_TIME(end);
    duration = end - start;
    printf("%f\n", duration);
-   // Print_vector("The product is", y, m );
 #ifdef DEBUG
    Print_vector("The product is", y, m);
 #endif
@@ -221,13 +218,13 @@ void *Pth_mat_vect(void *rank)
    int my_first_row = my_rank * local_m;
    int my_last_row = my_first_row + local_m;
    register int sub = my_first_row * n;
-   double start, finish;
+   // double start, finish;
    double temp;
 #ifdef DEBUG
    printf("Thread %ld > local_m = %d, sub = %d\n",
           my_rank, local_m, sub);
 #endif
-   GET_TIME(start);
+   // GET_TIME(start);
 
    for (i = my_first_row + cache_line / sizeof(double) * my_rank; i < my_last_row + cache_line / sizeof(double) * my_rank; i++)
    {

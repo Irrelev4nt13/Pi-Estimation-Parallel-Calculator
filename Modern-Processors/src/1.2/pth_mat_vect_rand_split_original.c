@@ -99,9 +99,8 @@ int main(int argc, char *argv[])
    GET_TIME(end);
    duration = end - start;
    printf("%f\n", duration);
+   Print_vector("We generated", y, m);
 
-   // Print_vector("MAKAROS", y, m);
-   // Print_vector("The product is", y, m);
 #ifdef DEBUG
 #endif
 
@@ -200,7 +199,7 @@ void *Pth_mat_vect(void *rank)
    int my_first_row = my_rank * local_m;
    int my_last_row = my_first_row + local_m;
    register int sub = my_first_row * n;
-   double start, finish;
+   // double start, finish;
    double temp;
 
 #ifdef DEBUG
@@ -208,7 +207,7 @@ void *Pth_mat_vect(void *rank)
           my_rank, local_m, sub);
 #endif
 
-   GET_TIME(start);
+   // GET_TIME(start);
    for (i = my_first_row; i < my_last_row; i++)
    {
       y[i] = 0.0;

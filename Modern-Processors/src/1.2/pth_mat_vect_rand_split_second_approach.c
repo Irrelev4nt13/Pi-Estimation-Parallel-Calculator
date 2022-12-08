@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
       }
    GET_TIME(finish);
    printf("%f\n", finish - start);
+   Print_vector("The product is", y, m);
 #ifdef DEBUG
    Print_vector("The product is", y, m);
 #endif
@@ -217,7 +218,7 @@ void *Pth_mat_vect(void *rank)
    register int sub = my_first_row * n;
    double start, finish;
    double temp, sum;
-
+   double *local=malloc((my_last_row-my_first_row)*sizeof(double));
 #ifdef DEBUG
    printf("Thread %ld > local_m = %d, sub = %d\n",
           my_rank, local_m, sub);
@@ -229,14 +230,12 @@ void *Pth_mat_vect(void *rank)
       {
          temp = A[sub++];
          temp *= x[j];
-         sum += temp;
+         local[i] += temp;
       }
-      // y[i] += sum;
    }
    
-   for (i = 0; i < (my_last_row - my_first_row); i++)
-      y[i] += sum;
-   
+   for (int j = 0; j < (my_last_row - my_first_row); j++)
+      y[j + my_first_row] = local[j];
    // GET_TIME(finish);
    // printf("Thread %ld > Elapsed time = %e seconds\n", my_rank, finish - start);
 
