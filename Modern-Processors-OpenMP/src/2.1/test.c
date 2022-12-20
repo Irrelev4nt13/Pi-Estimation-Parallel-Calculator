@@ -14,5 +14,4 @@ void Hello()
 {
     int my_rank=omp_get_thread_num();
     printf("Hi from %d",my_rank);
-    
 }

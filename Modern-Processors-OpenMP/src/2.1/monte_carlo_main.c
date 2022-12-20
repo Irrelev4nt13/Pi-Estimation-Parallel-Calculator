@@ -32,7 +32,7 @@ void *monte_carlo_parallel(void *rank)
 
 int main(int argc, char **argv)
 {
-    double start, end;
+    double start, end, duration;
     pthread_t *thread_id;
     if (argc < 3)
     {
@@ -40,13 +40,13 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
     throws = strtoll(argv[1], NULL, 10);
-
-    GET_TIME(start);
-    long long int arrows1 = monte_carlo(throws, 0, 1);
-    long double pi = 4 * arrows1 / ((long double)throws);
-    GET_TIME(end);
-    double duration = end - start;
-    printf("%Lf %f\n", pi, duration);
+    long double pi;
+    // GET_TIME(start);
+    // long long int arrows1 = monte_carlo(throws, 0, 1);
+    // pi = 4 * arrows1 / ((long double)throws);
+    // GET_TIME(end);
+    // duration = end - start;
+    // printf("%Lf %f\n", pi, duration);
 
     pthread_mutex_init(&mutex, NULL);
     thread_count = strtol(argv[2], NULL, 10);
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
     printf("%Lf %f\n", pi, duration);
 
     GET_TIME(start);
-    long long int arrowsMP=monte_carlo_parallelMP(throws);
+    long long int arrowsMP = monte_carlo_parallelMP(throws);
     pi = 4 * arrowsMP / ((long double)throws);
     GET_TIME(end);
     duration = end - start;
@@ -85,26 +85,26 @@ int main(int argc, char **argv)
 
 long long int monte_carlo_parallelMP(long long int throwsMP)
 {
-    long long int arrowsMP=0,i;
-    long double distance,x,y;
-    unsigned seed,tmp;
-    int first=0;
-    #pragma omp parallel for num_threads(thread_count) \
-    default(none) reduction(+: arrowsMP) private(i, x, y, distance,tmp,seed,first) shared(throwsMP)
-    for(i=0; i<throwsMP; i++)
+    long long int arrowsMP = 0, i;
+    long double distance, x, y;
+    unsigned seed, tmp;
+    int first = 0;
+#pragma omp parallel for num_threads(thread_count) default(none) reduction(+ \
+                                                                           : arrowsMP) private(i, x, y, distance, tmp, seed, first) shared(throwsMP)
+    for (i = 0; i < throwsMP; i++)
     {
-        if(first==0)
+        if (first == 0)
         {
-            seed=omp_get_thread_num()+1;
-            tmp=my_rand(&seed);
-            first=1;
+            seed = omp_get_thread_num() + 1;
+            tmp = my_rand(&seed);
+            first = 1;
         }
-        tmp=my_rand(&tmp);
+        tmp = my_rand(&tmp);
         x = my_drand(&tmp);
         y = my_drand(&tmp);
         distance = x * x + y * y;
         if (distance <= 1)
-            arrowsMP+=1;
+            arrowsMP += 1;
     }
     return arrowsMP;
 }
