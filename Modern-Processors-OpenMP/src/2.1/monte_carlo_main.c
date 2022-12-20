@@ -3,12 +3,16 @@
 #include <pthread.h>
 #include <unistd.h>
 
+// #ifdef _OPENMP
+#include <omp.h>
+// #endif
+
 #include "../../include/monte_carlo.h"
 #include "../../include/my_rand.h"
 #include "../../include/timer.h"
 
 pthread_mutex_t mutex;
-
+void Hello();
 int thread_count;
 long long int throws;
 long long int arrows = 0;
@@ -68,7 +72,25 @@ int main(int argc, char **argv)
     duration = end - start;
     printf("%Lf %f\n", pi, duration);
 
+    long long int arrowsMP;
+    int i, j, x, y, distance;
+    // #pragma omp parallel for num_threads(4) \
+    // default(none) reduction(+: arrowsMP) private(i, j, x, y, distance) shared(arrowsMP, throws)
+    // for(int i=0; i<2; i++)
+    // {
+    //     printf("Hi from %d\n",omp_get_thread_num());
+    // }
+#   pragma omp parallel num_threads(thread_count)
+    Hello();
+    
     pthread_mutex_destroy(&mutex);
     free(thread_id);
     return EXIT_SUCCESS;
+}
+
+void Hello()
+{
+    int my_rank=omp_get_thread_num();
+    printf("Hi from %d",my_rank);
+    
 }
