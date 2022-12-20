@@ -8,10 +8,10 @@ FILES=monte_carlo_main.c ../../modules/monte_carlo.c ../../modules/my_rand.c
 EXEC=exe
 
 #Parameters for run
-ARGS= 10000000 4
+ARGS= 10000320 4
 
 #Create executable
-$(EXEC):$(OBJS)
+$(EXEC):$(FILES)
 	$(CC) -g -fopenmp -o $(EXEC) $(FILES) -lpthread 
 
 #Run

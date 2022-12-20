@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "../include/my_rand.h"
 #include "../include/monte_carlo.h"
-
+#include "time.h"
 long long int monte_carlo(long long int throws, long long int start, int id)
 {
     unsigned seed = id, tmp;

@@ -11,7 +11,7 @@
 #include "../../include/monte_carlo.h"
 #include "../../include/my_rand.h"
 #include "../../include/timer.h"
-
+long long int monte_carlo_parallelMP(long long int);
 pthread_mutex_t mutex;
 int thread_count;
 long long int throws;
@@ -72,33 +72,39 @@ int main(int argc, char **argv)
     duration = end - start;
     printf("%Lf %f\n", pi, duration);
 
-    long long int arrowsMP=0;
-    int i, x, y,tmp;
-    long double distance;
-    unsigned seed;
+    GET_TIME(start);
+    long long int arrowsMP=monte_carlo_parallelMP(throws);
+    pi = 4 * arrowsMP / ((long double)throws);
+    GET_TIME(end);
+    duration = end - start;
+    printf("%Lf %f\n", pi, duration);
+    pthread_mutex_destroy(&mutex);
+    free(thread_id);
+    return EXIT_SUCCESS;
+}
+
+long long int monte_carlo_parallelMP(long long int throwsMP)
+{
+    long long int arrowsMP=0,i;
+    long double distance,x,y;
+    unsigned seed,tmp;
     int first=0;
     #pragma omp parallel for num_threads(thread_count) \
-    default(none) reduction(+: arrowsMP) private(i, x, y, distance,tmp,seed,first) shared(throws)
-    for(i=0; i<throws; i++)
+    default(none) reduction(+: arrowsMP) private(i, x, y, distance,tmp,seed,first) shared(throwsMP)
+    for(i=0; i<throwsMP; i++)
     {
         if(first==0)
         {
-            seed=omp_get_thread_num();
-            printf("asd\n");
+            seed=omp_get_thread_num()+1;
             tmp=my_rand(&seed);
             first=1;
         }
-        tmp=my_rand(&seed);
+        tmp=my_rand(&tmp);
         x = my_drand(&tmp);
         y = my_drand(&tmp);
         distance = x * x + y * y;
         if (distance <= 1)
             arrowsMP+=1;
     }
-    pi = 4 * arrowsMP / ((long double)throws);
-    printf("%Lf %lld %lld\n",pi,arrowsMP,arrows);
-    pthread_mutex_destroy(&mutex);
-    free(thread_id);
-    return EXIT_SUCCESS;
+    return arrowsMP;
 }
-
