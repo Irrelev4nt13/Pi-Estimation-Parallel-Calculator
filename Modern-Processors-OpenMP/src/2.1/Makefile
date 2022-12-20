@@ -2,17 +2,17 @@
 CC=gcc
 
 #.o Files
-OBJS=monte_carlo_main.o ../../modules/monte_carlo.o ../../modules/my_rand.o
+FILES=monte_carlo_main.c ../../modules/monte_carlo.c ../../modules/my_rand.c
 
 #Executable
 EXEC=exe
 
 #Parameters for run
-ARGS= 1000000 4
+ARGS= 10000000 4
 
 #Create executable
 $(EXEC):$(OBJS)
-	$(CC) -g -Wall $(OBJS) -o $(EXEC) -fopenmp
+	$(CC) -g -fopenmp -o $(EXEC) $(FILES) -lpthread 
 
 #Run
 run: $(EXEC)
@@ -20,4 +20,4 @@ run: $(EXEC)
 
 #Clear
 clean:
-	rm -f $(OBJS) $(EXEC) 	
+	rm -f $(EXEC) 	

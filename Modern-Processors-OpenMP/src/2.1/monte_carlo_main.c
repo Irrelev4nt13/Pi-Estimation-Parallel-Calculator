@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <time.h>
 
 // #ifdef _OPENMP
 #include <omp.h>
@@ -12,14 +13,13 @@
 #include "../../include/timer.h"
 
 pthread_mutex_t mutex;
-void Hello();
 int thread_count;
 long long int throws;
 long long int arrows = 0;
 void *monte_carlo_parallel(void *rank)
 {
     long my_rank = (long)rank;
-    long long int seg = throws / thread_count, my_arrows = 0, i;
+    long long int seg = throws / thread_count, my_arrows = 0;
     long long int first_throw = my_rank * seg, last_throw = (my_rank + 1) * seg;
 
     my_arrows = monte_carlo(last_throw, first_throw, my_rank + 1);
@@ -72,25 +72,33 @@ int main(int argc, char **argv)
     duration = end - start;
     printf("%Lf %f\n", pi, duration);
 
-    long long int arrowsMP;
-    int i, j, x, y, distance;
-    // #pragma omp parallel for num_threads(4) \
-    // default(none) reduction(+: arrowsMP) private(i, j, x, y, distance) shared(arrowsMP, throws)
-    // for(int i=0; i<2; i++)
-    // {
-    //     printf("Hi from %d\n",omp_get_thread_num());
-    // }
-#   pragma omp parallel num_threads(thread_count)
-    Hello();
-    
+    long long int arrowsMP=0;
+    int i, x, y,tmp;
+    long double distance;
+    unsigned seed;
+    int first=0;
+    #pragma omp parallel for num_threads(thread_count) \
+    default(none) reduction(+: arrowsMP) private(i, x, y, distance,tmp,seed,first) shared(throws)
+    for(i=0; i<throws; i++)
+    {
+        if(first==0)
+        {
+            seed=omp_get_thread_num();
+            printf("asd\n");
+            tmp=my_rand(&seed);
+            first=1;
+        }
+        tmp=my_rand(&seed);
+        x = my_drand(&tmp);
+        y = my_drand(&tmp);
+        distance = x * x + y * y;
+        if (distance <= 1)
+            arrowsMP+=1;
+    }
+    pi = 4 * arrowsMP / ((long double)throws);
+    printf("%Lf %lld %lld\n",pi,arrowsMP,arrows);
     pthread_mutex_destroy(&mutex);
     free(thread_id);
     return EXIT_SUCCESS;
 }
 
-void Hello()
-{
-    int my_rank=omp_get_thread_num();
-    printf("Hi from %d",my_rank);
-    
-}

@@ -7,7 +7,7 @@ void Hello();
 
 int main(void)
 {
-    int thread_count
+    
 }
 
 void Hello()
