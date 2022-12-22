@@ -3,10 +3,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <time.h>
-
-// #ifdef _OPENMP
 #include <omp.h>
-// #endif
 
 #include "../../include/monte_carlo.h"
 #include "../../include/my_rand.h"
@@ -41,12 +38,6 @@ int main(int argc, char **argv)
     }
     throws = strtoll(argv[1], NULL, 10);
     long double pi;
-    // GET_TIME(start);
-    // long long int arrows1 = monte_carlo(throws, 0, 1);
-    // pi = 4 * arrows1 / ((long double)throws);
-    // GET_TIME(end);
-    // duration = end - start;
-    // printf("%Lf %f\n", pi, duration);
 
     pthread_mutex_init(&mutex, NULL);
     thread_count = strtol(argv[2], NULL, 10);
