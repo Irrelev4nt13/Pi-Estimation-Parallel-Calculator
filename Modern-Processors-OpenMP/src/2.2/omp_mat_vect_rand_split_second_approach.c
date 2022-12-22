@@ -201,13 +201,10 @@ void Omp_mat_vect(double A[], double x[], double y[],
 
    GET_TIME(start);
 #  pragma omp parallel for num_threads(thread_count)  \
-      default(none) private(i, j, temp)  shared(A, x, y, m, n) schedule(static, 1)
+      default(none) private(i, j, temp)  shared(A, x, y, m, n) schedule(dynamic, 64)
    for (i = 0; i < m; i++) {
       y[i] = 0.0;
-      for (j = 0; j < n; j++) {
-         if (i>j)
-            break;
-         else 
+      for (j = i; j < n; j++) {
             temp = A[i*n+j]*x[j];
          y[i] += temp;
       }

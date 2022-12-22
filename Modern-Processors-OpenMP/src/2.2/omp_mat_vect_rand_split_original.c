@@ -83,8 +83,8 @@ int main(int argc, char* argv[]) {
 
    Omp_mat_vect(A, x, y, m, n, thread_count);
    // Read_matrix("Enter the matrix", A, m, n);
-   Print_matrix("We read", A, m, n);
-   Print_vector("The product is", y, m);
+   // Print_matrix("We read", A, m, n);
+   // Print_vector("The product is", y, m);
 #  ifdef DEBUG
 #  else
 /* Print_vector("The product is", y, m); */

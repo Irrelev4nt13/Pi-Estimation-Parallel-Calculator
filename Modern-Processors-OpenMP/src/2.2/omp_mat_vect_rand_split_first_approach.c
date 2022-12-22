@@ -88,9 +88,9 @@ int main(int argc, char* argv[]) {
 #  endif
 
    Omp_mat_vect(A, x, y, m, n, thread_count);
-   Print_matrix("We read", A, m, n);
-   Print_vector("We read", x, n);
-   Print_vector("The product is", y, m);
+   // Print_matrix("We read", A, m, n);
+   // Print_vector("We read", x, n);
+   // Print_vector("The product is", y, m);
 #  ifdef DEBUG
 #  else
 /* Print_vector("The product is", y, m); */
@@ -158,7 +158,10 @@ void Gen_matrix(double A[], int m, int n) {
    int i, j;
    for (i = 0; i < m; i++)
       for (j = 0; j < n; j++)
-         A[i*n+j] = random()/((double) RAND_MAX);
+         if ( i<=j)
+            A[i*n+j] = random()/((double) RAND_MAX);
+         else 
+            A[i*n+j] = 0;
 }  /* Gen_matrix */
 
 /*------------------------------------------------------------------
