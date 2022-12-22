@@ -65,6 +65,12 @@ int main(int argc, char* argv[]) {
 
    Get_args(argc, argv, &thread_count, &m, &n);
 
+   // if (m % thread_count != 0)
+   // {
+   //    fprintf(stdout, "m %% thread_count != 0\n");
+   //    return EXIT_FAILURE;
+   // }
+
    A = malloc(m*n*sizeof(double));
    x = malloc(n*sizeof(double));
    y = malloc(m*sizeof(double));
@@ -195,18 +201,21 @@ void Omp_mat_vect(double A[], double x[], double y[],
 
    GET_TIME(start);
 #  pragma omp parallel for num_threads(thread_count)  \
-      default(none) private(i, j, temp)  shared(A, x, y, m, n)
+      default(none) private(i, j, temp)  shared(A, x, y, m, n) schedule(static, 1)
    for (i = 0; i < m; i++) {
       y[i] = 0.0;
       for (j = 0; j < n; j++) {
-         temp = A[i*n+j]*x[j];
+         if (i>j)
+            break;
+         else 
+            temp = A[i*n+j]*x[j];
          y[i] += temp;
       }
    }
 
    GET_TIME(finish);
    elapsed = finish - start;
-   printf("Elapsed time = %e seconds\n", elapsed);
+   printf("Elapsed time = %f seconds\n", elapsed);
 
 }  /* Omp_mat_vect */
 
