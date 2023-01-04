@@ -194,8 +194,7 @@ void Read_vector(char* prompt, double x[], int n) {
  * In args:   A, x, m, n, thread_count
  * Out arg:   y
  */
-void Omp_mat_vect(double A[], double x[], double y[],
-      int m, int n, int thread_count) {
+void Omp_mat_vect(double A[], double x[], double y[], int m, int n, int thread_count) {
    int i, j;
    double start, finish, elapsed, temp;
 
