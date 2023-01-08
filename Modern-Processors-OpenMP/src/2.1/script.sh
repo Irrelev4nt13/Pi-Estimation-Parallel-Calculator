@@ -68,7 +68,7 @@ do
             values[i]=$( echo " ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
         done
         echo $throws $thread_num ${values[@]} >> ${NEW_FILE}
-        throws=$(( $throws + $throws_step ))
+        throws=$(( $throws + $throws_step))
     done
     thread_num=$(( $thread_num + 2 ))
     echo "#" >> ${NEW_FILE}

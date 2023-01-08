@@ -3,12 +3,12 @@ CC=gcc
 
 #.o Files
 FILES=monte_carlo_main.c ../../modules/monte_carlo.c ../../modules/my_rand.c
-
+# FILES=book.c ../../modules1/my_rand.c
 #Executable
 EXEC=exe
 
 #Parameters for run
-ARGS= 10000320 4
+ARGS=100000000 4 
 
 #Create executable
 $(EXEC):$(FILES)

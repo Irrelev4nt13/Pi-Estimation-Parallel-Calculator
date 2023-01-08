@@ -11,9 +11,8 @@ long long int monte_carlo(long long int throws, long long int start, int id)
     tmp = my_rand(&seed);
     for (i = start; i < throws; i++)
     {
-        tmp = my_rand(&tmp);
-        x = my_drand(&tmp);
-        y = my_drand(&tmp);
+        x = -1 + 2 * my_drand(&seed);
+        y = -1 + 2 * my_drand(&seed);
         long double distance = x * x + y * y;
         if (distance <= 1)
             my_arrows++;

@@ -9,7 +9,7 @@ OBJS_1=omp_mat_vect_rand_split_first_approach.o
 OBJS_2=omp_mat_vect_rand_split_second_approach.o
 
 #Executable
-EXEC_0=exe_o
+EXEC_0=exe_0
 
 EXEC_1=exe_1
 

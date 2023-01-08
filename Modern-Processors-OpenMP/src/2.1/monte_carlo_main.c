@@ -63,8 +63,9 @@ int main(int argc, char **argv)
     duration = end - start;
     printf("%Lf %f\n", pi, duration);
 
+    long long int arrowsMP;
     GET_TIME(start);
-    long long int arrowsMP = monte_carlo_parallelMP(throws);
+    arrowsMP = monte_carlo_parallelMP(throws);
     pi = 4 * arrowsMP / ((long double)throws);
     GET_TIME(end);
     duration = end - start;
@@ -76,26 +77,22 @@ int main(int argc, char **argv)
 
 long long int monte_carlo_parallelMP(long long int throwsMP)
 {
-    long long int arrowsMP = 0, i;
-    long double distance, x, y;
-    unsigned seed, tmp;
-    int first = 0;
-#pragma omp parallel for num_threads(thread_count) default(none) reduction(+ \
-                                                                           : arrowsMP) private(i, x, y, distance, tmp, seed, first) shared(throwsMP)
-    for (i = 0; i < throwsMP; i++)
+    long long int arrowsMP = 0;
+#pragma omp parallel num_threads(thread_count) default(none) reduction(+ \
+                                                                       : arrowsMP) shared(throwsMP)
     {
-        if (first == 0)
+        long long int i, my_rank = omp_get_thread_num();
+        long double distance, x, y;
+        unsigned seed = my_rank + 1, tmp;
+#pragma omp for
+        for (i = 0; i < throwsMP; i++)
         {
-            seed = omp_get_thread_num() + 1;
-            tmp = my_rand(&seed);
-            first = 1;
+            x = -1 + 2 * my_drand(&seed);
+            y = -1 + 2 * my_drand(&seed);
+            distance = x * x + y * y;
+            if (distance <= 1)
+                arrowsMP++;
         }
-        tmp = my_rand(&tmp);
-        x = my_drand(&tmp);
-        y = my_drand(&tmp);
-        distance = x * x + y * y;
-        if (distance <= 1)
-            arrowsMP += 1;
     }
     return arrowsMP;
 }
