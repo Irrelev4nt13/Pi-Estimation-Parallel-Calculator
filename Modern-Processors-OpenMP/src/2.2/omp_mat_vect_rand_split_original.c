@@ -210,7 +210,7 @@ void Omp_mat_vect(double A[], double x[], double y[],
 
    GET_TIME(finish);
    elapsed = finish - start;
-   printf("Elapsed time = %f seconds\n", elapsed);
+   printf("%f\n", elapsed);
 
 }  /* Omp_mat_vect */
 

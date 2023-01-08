@@ -1,17 +1,20 @@
-/* File:
- *     omp_mat_vect_rand_split.c
+/* File:   ex5.15_omp_mat_vect_pad.c
  *
  * Purpose:
  *     Computes a parallel matrix-vector product.  Matrix
  *     is distributed by block rows.  Vectors are distributed by
- *     blocks.  This version uses a random number generator to
- *     generate A and x.  There is some optimization.
+ *     blocks.  Unless the DEBUG flag is turned on this version
+ *     uses a random number generator to generate A and x.
+ *     This version pads the vector y with enough entries
+ *     so that there won't be false sharing between the threads.
+ *     This is a modified version of omp_mat_vect_rand_split.c
  *
  * Compile:
- *    gcc -g -Wall -fopenmp -o omp_mat_vect_rand_split
- *          omp_mat_vect_rand_split.c
- * Run:
- *    ./omp_mat_vect_rand_split <thread_count> <m> <n>
+ *    gcc -g -Wall -fopenmp -o ex5.15_omp_mat_vect_pad
+ *          ex5.15_omp_mat_vect_pad.c
+ *
+ * Usage:
+ *    ./ex5.15_omp_mat_vect_pad <thread_count> <m> <n>
  *
  * Input:
  *     None unless compiled with DEBUG flag.
@@ -31,14 +34,15 @@
  *         globally shared.
  *     5.  DEBUG compile flag will prompt for input of A, x, and
  *         print y
+ *     6.  Uses the OpenMP library function omp_get_wtime() to
+ *         return the time elapsed since some point in the past
  *
- * IPP:  Exercise 5.12
+ * IPP:    Exercise 5.15
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-#include "timer.h"
 
 /* Serial functions */
 void Get_args(int argc, char *argv[], int *thread_count_p,
@@ -58,49 +62,55 @@ void Omp_mat_vect(double A[], double x[], double y[],
 /*------------------------------------------------------------------*/
 int main(int argc, char *argv[])
 {
-   int thread_count;
-   int m, n;
-   double *A;
-   double *x;
-   double *y;
+    int thread_count;
+    int m, n;
+    double *A;
+    double *x;
+    double *y;
 
-   Get_args(argc, argv, &thread_count, &m, &n);
+    Get_args(argc, argv, &thread_count, &m, &n);
 
-   // if (m % thread_count != 0)
-   // {
-   //    fprintf(stdout, "m %% thread_count != 0\n");
-   //    return EXIT_FAILURE;
-   // }
-
-   A = malloc(m * n * sizeof(double));
-   x = malloc(n * sizeof(double));
-   y = malloc(m * sizeof(double));
+    A = malloc(m * n * sizeof(double));
+    x = malloc(n * sizeof(double));
+    y = malloc((m + 8 * thread_count) * sizeof(double));
 
 #ifdef DEBUG
-   Read_matrix("Enter the matrix", A, m, n);
-   Print_matrix("We read", A, m, n);
-   Read_vector("Enter the vector", x, n);
-   Print_vector("We read", x, n);
+    Read_matrix("Enter the matrix", A, m, n);
+    Print_matrix("We read", A, m, n);
+    Read_vector("Enter the vector", x, n);
+    Print_vector("We read", x, n);
 #else
-   Gen_matrix(A, m, n);
-   /* Print_matrix("We generated", A, m, n); */
-   Gen_vector(x, n);
-/* Print_vector("We generated", x, n); */
+    Gen_matrix(A, m, n);
+    // Print_matrix("We generated", A, m, n);
+    Gen_vector(x, n);
+// Print_vector("We generated", x, n);
 #endif
 
-   Omp_mat_vect(A, x, y, m, n, thread_count);
+    Omp_mat_vect(A, x, y, m, n, thread_count);
 
 #ifdef DEBUG
-   Print_vector("The product is", y, m);
-#else
-/* Print_vector("The product is", y, m); */
+    {
+        int i, j = 0;
+        printf("The product is\n");
+        for (i = 0; i < m + 8 * thread_count; i++)
+        {
+            printf("%4.1f ", y[i]);
+            j++;
+            if (j == (m / thread_count))
+            {
+                j = 0;
+                i += 8;
+            }
+        }
+        printf("\n");
+    }
 #endif
 
-   free(A);
-   free(x);
-   free(y);
+    free(A);
+    free(x);
+    free(y);
 
-   return 0;
+    return 0;
 } /* main */
 
 /*------------------------------------------------------------------
@@ -113,13 +123,13 @@ void Get_args(int argc, char *argv[], int *thread_count_p,
               int *m_p, int *n_p)
 {
 
-   if (argc != 4)
-      Usage(argv[0]);
-   *thread_count_p = strtol(argv[1], NULL, 10);
-   *m_p = strtol(argv[2], NULL, 10);
-   *n_p = strtol(argv[3], NULL, 10);
-   if (*thread_count_p <= 0 || *m_p <= 0 || *n_p <= 0)
-      Usage(argv[0]);
+    if (argc != 4)
+        Usage(argv[0]);
+    *thread_count_p = strtol(argv[1], NULL, 10);
+    *m_p = strtol(argv[2], NULL, 10);
+    *n_p = strtol(argv[3], NULL, 10);
+    if (*thread_count_p <= 0 || *m_p <= 0 || *n_p <= 0)
+        Usage(argv[0]);
 
 } /* Get_args */
 
@@ -131,8 +141,8 @@ void Get_args(int argc, char *argv[], int *thread_count_p,
  */
 void Usage(char *prog_name)
 {
-   fprintf(stderr, "usage: %s <thread_count> <m> <n>\n", prog_name);
-   exit(0);
+    fprintf(stderr, "usage: %s <thread_count> <m> <n>\n", prog_name);
+    exit(0);
 } /* Usage */
 
 /*------------------------------------------------------------------
@@ -143,12 +153,12 @@ void Usage(char *prog_name)
  */
 void Read_matrix(char *prompt, double A[], int m, int n)
 {
-   int i, j;
+    int i, j;
 
-   printf("%s\n", prompt);
-   for (i = 0; i < m; i++)
-      for (j = 0; j < n; j++)
-         scanf("%lf", &A[i * n + j]);
+    printf("%s\n", prompt);
+    for (i = 0; i < m; i++)
+        for (j = 0; j < n; j++)
+            scanf("%lf", &A[i * n + j]);
 } /* Read_matrix */
 
 /*------------------------------------------------------------------
@@ -160,10 +170,13 @@ void Read_matrix(char *prompt, double A[], int m, int n)
  */
 void Gen_matrix(double A[], int m, int n)
 {
-   int i, j;
-   for (i = 0; i < m; i++)
-      for (j = 0; j < n; j++)
-         A[i * n + j] = random() / ((double)RAND_MAX);
+    int i, j;
+    for (i = 0; i < m; i++)
+        for (j = 0; j < n; j++)
+            if (i <= j)
+                A[i * n + j] = random() / ((double)RAND_MAX);
+            else
+                A[i * n + j] = 0;
 } /* Gen_matrix */
 
 /*------------------------------------------------------------------
@@ -175,9 +188,9 @@ void Gen_matrix(double A[], int m, int n)
  */
 void Gen_vector(double x[], int n)
 {
-   int i;
-   for (i = 0; i < n; i++)
-      x[i] = random() / ((double)RAND_MAX);
+    int i;
+    for (i = 0; i < n; i++)
+        x[i] = random() / ((double)RAND_MAX);
 } /* Gen_vector */
 
 /*------------------------------------------------------------------
@@ -188,11 +201,11 @@ void Gen_vector(double x[], int n)
  */
 void Read_vector(char *prompt, double x[], int n)
 {
-   int i;
+    int i;
 
-   printf("%s\n", prompt);
-   for (i = 0; i < n; i++)
-      scanf("%lf", &x[i]);
+    printf("%s\n", prompt);
+    for (i = 0; i < n; i++)
+        scanf("%lf", &x[i]);
 } /* Read_vector */
 
 /*------------------------------------------------------------------
@@ -201,29 +214,27 @@ void Read_vector(char *prompt, double x[], int n)
  * In args:   A, x, m, n, thread_count
  * Out arg:   y
  */
-void Omp_mat_vect(double A[], double x[], double y[], int m, int n, int thread_count)
+void Omp_mat_vect(double A[], double x[], double y[],
+                  int m, int n, int thread_count)
 {
-   int i, j;
-   double start, finish, elapsed, temp;
+    int i, j;
+    double start, finish, elapsed;
 
-   GET_TIME(start);
-#pragma omp parallel num_threads(thread_count) default(none) private(i, j, temp) shared(A, x, y, m, n)
-   {
-#pragma omp for schedule(dynamic, 100)
-      for (i = 0; i < m; i++)
-      {
-         y[i] = 0.0;
-         for (j = i; j < n; j++)
-         {
-            temp = A[i * n + j] * x[j];
-            y[i] += temp;
-         }
-      }
-   }
-
-   GET_TIME(finish);
-   elapsed = finish - start;
-   printf("%f\n", elapsed);
+    start = omp_get_wtime();
+#pragma omp parallel num_threads(thread_count) default(none) private(i, j) shared(A, x, y, m, n)
+    {
+        int my_rank = omp_get_thread_num();
+#pragma omp for
+        for (i = 0; i < m; i++)
+        {
+            y[i + (my_rank * 8)] = 0.0;
+            for (j = i; j < n; j++)
+                y[i + (my_rank * 8)] += A[i * n + j] * x[j];
+        }
+    } /* pragma omp parallel */
+    finish = omp_get_wtime();
+    elapsed = finish - start;
+    printf("Elapsed time = %f seconds\n", elapsed);
 
 } /* Omp_mat_vect */
 
@@ -234,15 +245,15 @@ void Omp_mat_vect(double A[], double x[], double y[], int m, int n, int thread_c
  */
 void Print_matrix(char *title, double A[], int m, int n)
 {
-   int i, j;
+    int i, j;
 
-   printf("%s\n", title);
-   for (i = 0; i < m; i++)
-   {
-      for (j = 0; j < n; j++)
-         printf("%4.1f ", A[i * n + j]);
-      printf("\n");
-   }
+    printf("%s\n", title);
+    for (i = 0; i < m; i++)
+    {
+        for (j = 0; j < n; j++)
+            printf("%4.1f ", A[i * n + j]);
+        printf("\n");
+    }
 } /* Print_matrix */
 
 /*------------------------------------------------------------------
@@ -252,10 +263,10 @@ void Print_matrix(char *title, double A[], int m, int n)
  */
 void Print_vector(char *title, double y[], double m)
 {
-   int i;
+    int i;
 
-   printf("%s\n", title);
-   for (i = 0; i < m; i++)
-      printf("%4.1f ", y[i]);
-   printf("\n");
+    printf("%s\n", title);
+    for (i = 0; i < m; i++)
+        printf("%4.1f ", y[i]);
+    printf("\n");
 } /* Print_vector */

@@ -8,6 +8,8 @@ OBJS_1=omp_mat_vect_rand_split_first_approach.o
 
 OBJS_2=omp_mat_vect_rand_split_second_approach.o
 
+OBJS_3=book.o
+
 #Executable
 EXEC_0=exe_0
 
@@ -15,11 +17,13 @@ EXEC_1=exe_1
 
 EXEC_2=exe_2
 
+EXEC_3=exe_3
+
 #Parameters for run
-ARGS= 1 8000000 8
+ARGS= 4 8000 8000
 
 
-all: $(EXEC_0) $(EXEC_1) $(EXEC_2)
+all: $(EXEC_0) $(EXEC_1) $(EXEC_2) $(EXEC_3)
 
 #Create executable
 $(EXEC_0):$(OBJS_0)
@@ -31,6 +35,9 @@ $(EXEC_1):$(OBJS_1)
 $(EXEC_2):$(OBJS_2)
 	$(CC) -g -Wall $(OBJS_2) -o $(EXEC_2) -fopenmp
 
+$(EXEC_3):$(OBJS_3)
+	$(CC) -g -Wall $(OBJS_3) -o $(EXEC_3) -fopenmp
+
 
 original: $(EXEC_0)
 	./$(EXEC_0) $(ARGS)
@@ -41,6 +48,8 @@ first: $(EXEC_1)
 second: $(EXEC_2)
 	./$(EXEC_2) $(ARGS)
 
+third: $(EXEC_3)
+	./$(EXEC_3) $(ARGS)
 #Clear
 clean:
-	rm -f $(OBJS_0) $(OBJS_1) $(OBJS_2) $(EXEC_0) $(EXEC_1) $(EXEC_2) 	
+	rm -f $(OBJS_0) $(OBJS_1) $(OBJS_2) $(OBJS_3) $(EXEC_0) $(EXEC_1) $(EXEC_2) $(EXEC_3)
