@@ -214,7 +214,7 @@ void Omp_mat_vect(double A[], double x[], double y[],
    GET_TIME(start);
 #pragma omp parallel num_threads(thread_count) default(none) private(i, j, temp) shared(A, x, y, m, n)
    {
-#pragma omp for schedule(dynamic, 8)
+#pragma omp for
       for (i = 0; i < m; i++)
       {
          y[i] = 0.0;

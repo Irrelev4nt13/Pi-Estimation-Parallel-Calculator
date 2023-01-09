@@ -207,9 +207,13 @@ void Omp_mat_vect(double A[], double x[], double y[], int m, int n, int thread_c
    double start, finish, elapsed, temp;
 
    GET_TIME(start);
+   // setenv("OMP_SCHEDULE", "dynamic", 100);
+   // $ export OMP_SCHEDULE="static,1"
 #pragma omp parallel num_threads(thread_count) default(none) private(i, j, temp) shared(A, x, y, m, n)
    {
-#pragma omp for schedule(dynamic, 100)
+      omp_set_schedule(omp_sched_dynamic, 100);
+      // set OMP_SCHEDULE = dynamic;
+#pragma omp for schedule(runtime)
       for (i = 0; i < m; i++)
       {
          y[i] = 0.0;

@@ -20,7 +20,7 @@ EXEC_2=exe_2
 EXEC_3=exe_3
 
 #Parameters for run
-ARGS= 4 8000 8000
+ARGS= 4 8000000 8
 
 
 all: $(EXEC_0) $(EXEC_1) $(EXEC_2) $(EXEC_3)
