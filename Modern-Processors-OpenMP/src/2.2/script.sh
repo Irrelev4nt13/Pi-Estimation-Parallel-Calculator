@@ -12,29 +12,29 @@ rm -f ${FILE}
 touch ${FILE}
 for k in {1..3} 
 do  
-    # declare -a values=(
-    #     [0]=0
-    #     [1]=0
-    #     [2]=0
-    #     [3]=0
-    #     )
-    # for i in {1..4}
-    # do 
-    #     values[0]=$(echo ${values[0]} + $(./exe_0 $thread_num 8000000 8) | bc -l | sed 's/^\./0./')
-    #     values[1]=$(echo ${values[1]} + $(./exe_0 $thread_num 8000 8000) | bc -l | sed 's/^\./0./')
-    #     values[2]=$(echo ${values[2]} + $(./exe_0 $thread_num 8 8000000) | bc -l | sed 's/^\./0./')
-    #     values[3]=$(echo ${values[3]} + $(./exe_0 $thread_num 8 80000000) | bc -l | sed 's/^\./0./')
-    # done
-    # for i in {0..3}
-    # do
-    #     values[i]=$(echo "scale=6; ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
-    # done
-    # echo "$thread_num 8000000 8 ${values[0]}" >> ${FILE}
-    # echo "$thread_num 8000 8000 ${values[1]}" >> ${FILE}
-    # echo "$thread_num 8 8000000 ${values[2]}" >> ${FILE}
-    # echo "$thread_num 8 80000000 ${values[3]}" >> ${FILE}
+    declare -a values=(
+        [0]=0
+        [1]=0
+        [2]=0
+        [3]=0
+        )
+    for i in {1..4}
+    do 
+        values[0]=$(echo ${values[0]} + $(./exe_0 $thread_num 8000000 8) | bc -l | sed 's/^\./0./')
+        values[1]=$(echo ${values[1]} + $(./exe_0 $thread_num 8000 8000) | bc -l | sed 's/^\./0./')
+        values[2]=$(echo ${values[2]} + $(./exe_0 $thread_num 8 8000000) | bc -l | sed 's/^\./0./')
+        values[3]=$(echo ${values[3]} + $(./exe_0 $thread_num 8 80000000) | bc -l | sed 's/^\./0./')
+    done
+    for i in {0..3}
+    do
+        values[i]=$(echo " ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
+    done
+    echo "$thread_num 8000000 8 ${values[0]}" >> ${FILE}
+    echo "$thread_num 8000 8000 ${values[1]}" >> ${FILE}
+    echo "$thread_num 8 8000000 ${values[2]}" >> ${FILE}
+    echo "$thread_num 8 80000000 ${values[3]}" >> ${FILE}
 
-    # echo "#" >> ${FILE}
+    echo "#" >> ${FILE}
 
     declare -a values=(
         [0]=0
@@ -58,30 +58,6 @@ do
     echo "$thread_num 8 8000000 ${values[2]}" >> ${FILE}
     echo "$thread_num 8 80000000 ${values[3]}" >> ${FILE}
 
-    echo "#" >> ${FILE}
-
-    declare -a values=(
-        [0]=0
-        [1]=0
-        [2]=0
-        [3]=0
-        )
-    for i in {1..4}
-    do 
-        values[0]=$(echo ${values[0]} + $(./exe_2 $thread_num 8000000 8) | bc -l | sed 's/^\./0./')
-        values[1]=$(echo ${values[1]} + $(./exe_2 $thread_num 8000 8000) | bc -l | sed 's/^\./0./')
-        values[2]=$(echo ${values[2]} + $(./exe_2 $thread_num 8 8000000) | bc -l | sed 's/^\./0./')
-        values[3]=$(echo ${values[3]} + $(./exe_2 $thread_num 8 80000000) | bc -l | sed 's/^\./0./')
-    done
-    for i in {0..3}
-    do
-        values[i]=$(echo " ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
-    done
-    echo "$thread_num 8000000 8 ${values[0]}" >> ${FILE}
-    echo "$thread_num 8000 8000 ${values[1]}" >> ${FILE}
-    echo "$thread_num 8 8000000 ${values[2]}" >> ${FILE}
-    echo "$thread_num 8 80000000 ${values[3]}" >> ${FILE}
-
     echo "$" >> ${FILE}
     if [ $k == 1 ]
     then
@@ -92,5 +68,73 @@ do
     else
         thread_num=$(( $thread_num + 2 ))
     fi
+done
+echo "%" >> ${FILE}
+declare -a chunk=(
+[0]=1
+[1]=4
+[2]=8
+[3]=100
+)
+for m in {0..3}
+do
+    thread_num=$1
+    for j in {1..3}
+    do
+        for k in {1..4}
+        do
+            declare -a values=(
+            [0]=0
+            [1]=0
+            [2]=0
+            [3]=0
+            )
+            for i in {0..3}
+            do 
+                values[0]=$(echo ${values[0]} + $(./exe_2 $thread_num 8000000 8 $k ${chunk[$m]}) | bc -l | sed 's/^\./0./')
+                values[1]=$(echo ${values[1]} + $(./exe_2 $thread_num 8000 8000 $k ${chunk[$m]}) | bc -l | sed 's/^\./0./')
+                values[2]=$(echo ${values[2]} + $(./exe_2 $thread_num 8 8000000 $k ${chunk[$m]}) | bc -l | sed 's/^\./0./')
+                values[3]=$(echo ${values[3]} + $(./exe_2 $thread_num 8 80000000 $k ${chunk[$m]}) | bc -l | sed 's/^\./0./')
+            done
+            for i in {0..3}
+            do
+                values[i]=$(echo " ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
+            done
+            if [ $k == 1 ]
+            then
+                echo "$thread_num 8000000 8 ${values[0]} static ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8000 8000 ${values[1]} static ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8 8000000 ${values[2]} static ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8 80000000 ${values[3]} static ${chunk[$m]}" >> ${FILE}
+                echo "#" >> ${FILE}
+            elif [ $k == 2 ]
+            then
+                echo "$thread_num 8000000 8 ${values[0]} dynamic ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8000 8000 ${values[1]} dynamic ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8 8000000 ${values[2]} dynamic ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8 80000000 ${values[3]} dynamic ${chunk[$m]}" >> ${FILE}
+                echo "#" >> ${FILE}
+            elif [ $k == 3 ]
+            then
+                echo "$thread_num 8000000 8 ${values[0]} guided ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8000 8000 ${values[1]} guided ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8 8000000 ${values[2]} guided ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8 80000000 ${values[3]} guided ${chunk[$m]}" >> ${FILE}
+                echo "#" >> ${FILE}
+            else
+                echo "$thread_num 8000000 8 ${values[0]} auto ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8000 8000 ${values[1]} auto ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8 8000000 ${values[2]} auto ${chunk[$m]}" >> ${FILE}
+                echo "$thread_num 8 80000000 ${values[3]} auto ${chunk[$m]}" >> ${FILE}
+                echo "%" >> ${FILE}
+            fi
+        done
+        if [ $j == 2 ]
+        then
+            thread_num=$(( $thread_num + 4 ))
+        else
+            thread_num=$(( $thread_num + 2 ))
+        fi
+    done
 done
 make -s clean

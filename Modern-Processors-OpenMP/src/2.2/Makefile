@@ -19,7 +19,7 @@ EXEC_2=exe_2
 EXEC_3=exe_3
 
 #Parameters for run
-ARGS= 4 8000 8000 1 100
+ARGS= 2 8000 8000 1 100
 
 all: $(EXEC_0) $(EXEC_1) $(EXEC_2)
 
@@ -33,11 +33,11 @@ $(EXEC_1):$(File_1)
 $(EXEC_2):$(File_2)
 	$(CC) -g -Wall -fopenmp -o $(EXEC_2) $(File_2) 
 
-original: $(EXEC_0)
-	./$(EXEC_0) $(ARGS)
+# original: $(EXEC_0)
+# 	./$(EXEC_0) $(ARGS)
 
-first: $(EXEC_1)
-	./$(EXEC_1) $(ARGS)
+# first: $(EXEC_1)
+# 	./$(EXEC_1) $(ARGS)
 
 second: $(EXEC_2)
 	./$(EXEC_2) $(ARGS)

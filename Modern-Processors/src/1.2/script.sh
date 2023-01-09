@@ -27,7 +27,7 @@ do
     done
     for i in {0..3}
     do
-        values[i]=$(echo "scale=6; ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
+        values[i]=$(echo " ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
     done
     echo "$thread_num 8000000 8 ${values[0]}" >> ${FILE}
     echo "$thread_num 8000 8000 ${values[1]}" >> ${FILE}
@@ -51,7 +51,7 @@ do
     done
     for i in {0..3}
     do
-        values[i]=$(echo "scale=6; ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
+        values[i]=$(echo " ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
     done
     echo "$thread_num 8000000 8 ${values[0]}" >> ${FILE}
     echo "$thread_num 8000 8000 ${values[1]}" >> ${FILE}
@@ -75,7 +75,7 @@ do
     done
     for i in {0..3}
     do
-        values[i]=$(echo "scale=6; ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
+        values[i]=$(echo " ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
     done
     echo "$thread_num 8000000 8 ${values[0]}" >> ${FILE}
     echo "$thread_num 8000 8000 ${values[1]}" >> ${FILE}

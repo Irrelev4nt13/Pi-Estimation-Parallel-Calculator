@@ -65,7 +65,7 @@ do
             IFS='.'
             read -ra length <<< "${values[i]}"
             IFS=" "
-            values[i]=$( echo "scale=6; ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
+            values[i]=$( echo " ${values[i]} / 4" | bc -l | sed 's/^\./0./' )
         done
         echo $throws $thread_num ${values[@]} >> ${NEW_FILE}
         throws=$(( $throws + $throws_step ))
