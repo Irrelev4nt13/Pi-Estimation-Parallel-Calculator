@@ -38,7 +38,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-#include "timer.h"
+#include "../../include/timer.h"
 
 /* Serial functions */
 void Get_args(int argc, char *argv[], int *thread_count_p,
@@ -66,11 +66,11 @@ int main(int argc, char *argv[])
 
    Get_args(argc, argv, &thread_count, &m, &n);
 
-   // if (m % thread_count != 0)
-   // {
-   //    fprintf(stdout, "m %% thread_count != 0\n");
-   //    return EXIT_FAILURE;
-   // }
+   if (m % thread_count != 0)
+   {
+      fprintf(stdout, "m %% thread_count != 0\n");
+      return EXIT_FAILURE;
+   }
 
    A = malloc(m * n * sizeof(double));
    x = malloc(n * sizeof(double));
@@ -212,17 +212,14 @@ void Omp_mat_vect(double A[], double x[], double y[],
    double start, finish, elapsed, temp;
 
    GET_TIME(start);
-#pragma omp parallel num_threads(thread_count) default(none) private(i, j, temp) shared(A, x, y, m, n)
+#pragma omp parallel for num_threads(thread_count) default(none) private(i, j, temp) shared(A, x, y, m, n)
+   for (i = 0; i < m; i++)
    {
-#pragma omp for
-      for (i = 0; i < m; i++)
+      y[i] = 0.0;
+      for (j = i; j < n; j++)
       {
-         y[i] = 0.0;
-         for (j = i; j < n; j++)
-         {
-            temp = A[i * n + j] * x[j];
-            y[i] += temp;
-         }
+         temp = A[i * n + j] * x[j];
+         y[i] += temp;
       }
    }
 

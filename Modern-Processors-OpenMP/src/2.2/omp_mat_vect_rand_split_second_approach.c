@@ -38,11 +38,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-#include "timer.h"
-
+#include "../../include/timer.h"
+#include <string.h>
 /* Serial functions */
 void Get_args(int argc, char *argv[], int *thread_count_p,
-              int *m_p, int *n_p);
+              int *m_p, int *n_p, int *, int *);
 void Usage(char *prog_name);
 void Gen_matrix(double A[], int m, int n);
 void Read_matrix(char *prompt, double A[], int m, int n);
@@ -53,24 +53,22 @@ void Print_vector(char *title, double y[], double m);
 
 /* Parallel function */
 void Omp_mat_vect(double A[], double x[], double y[],
-                  int m, int n, int thread_count);
+                  int m, int n, int thread_count, int schedule_type, int chunk_size);
 
 /*------------------------------------------------------------------*/
 int main(int argc, char *argv[])
 {
    int thread_count;
-   int m, n;
+   int m, n, chunk_size, schedule_type;
    double *A;
    double *x;
    double *y;
-
-   Get_args(argc, argv, &thread_count, &m, &n);
-
-   // if (m % thread_count != 0)
-   // {
-   //    fprintf(stdout, "m %% thread_count != 0\n");
-   //    return EXIT_FAILURE;
-   // }
+   Get_args(argc, argv, &thread_count, &m, &n, &chunk_size, &schedule_type);
+   if (m % thread_count != 0)
+   {
+      fprintf(stdout, "m %% thread_count != 0\n");
+      return EXIT_FAILURE;
+   }
 
    A = malloc(m * n * sizeof(double));
    x = malloc(n * sizeof(double));
@@ -88,7 +86,7 @@ int main(int argc, char *argv[])
 /* Print_vector("We generated", x, n); */
 #endif
 
-   Omp_mat_vect(A, x, y, m, n, thread_count);
+   Omp_mat_vect(A, x, y, m, n, thread_count, schedule_type, chunk_size);
 
 #ifdef DEBUG
    Print_vector("The product is", y, m);
@@ -110,14 +108,26 @@ int main(int argc, char *argv[])
  * Out args:  thread_count_p, m_p, n_p
  */
 void Get_args(int argc, char *argv[], int *thread_count_p,
-              int *m_p, int *n_p)
+              int *m_p, int *n_p, int *chunk_size, int *schedule_type)
 {
 
-   if (argc != 4)
+   if (argc != 6)
       Usage(argv[0]);
    *thread_count_p = strtol(argv[1], NULL, 10);
    *m_p = strtol(argv[2], NULL, 10);
    *n_p = strtol(argv[3], NULL, 10);
+   *schedule_type = strtol(argv[4], NULL, 10);
+   if (*schedule_type > 4 || *schedule_type < 0)
+   {
+      fprintf(stderr, "The scedule type has to be >0 and <5\n");
+      exit(0);
+   }
+   *chunk_size = strtol(argv[5], NULL, 10);
+   if (*chunk_size < 1)
+   {
+      fprintf(stderr, "The chunk size has to be positive\n");
+      exit(0);
+   }
    if (*thread_count_p <= 0 || *m_p <= 0 || *n_p <= 0)
       Usage(argv[0]);
 
@@ -131,7 +141,7 @@ void Get_args(int argc, char *argv[], int *thread_count_p,
  */
 void Usage(char *prog_name)
 {
-   fprintf(stderr, "usage: %s <thread_count> <m> <n>\n", prog_name);
+   fprintf(stderr, "usage: %s <thread_count> <m> <n> <schedule_type> <chunk_size>\n", prog_name);
    exit(0);
 } /* Usage */
 
@@ -201,27 +211,21 @@ void Read_vector(char *prompt, double x[], int n)
  * In args:   A, x, m, n, thread_count
  * Out arg:   y
  */
-void Omp_mat_vect(double A[], double x[], double y[], int m, int n, int thread_count)
+void Omp_mat_vect(double A[], double x[], double y[], int m, int n, int thread_count, int schedule_type, int chunk_size)
 {
    int i, j;
    double start, finish, elapsed, temp;
 
    GET_TIME(start);
-   // setenv("OMP_SCHEDULE", "dynamic", 100);
-   // $ export OMP_SCHEDULE="static,1"
-#pragma omp parallel num_threads(thread_count) default(none) private(i, j, temp) shared(A, x, y, m, n)
+   omp_set_schedule(schedule_type, chunk_size);
+#pragma omp parallel for num_threads(thread_count) default(none) schedule(runtime) private(i, j, temp) shared(A, x, y, m, n)
+   for (i = 0; i < m; i++)
    {
-      omp_set_schedule(omp_sched_dynamic, 100);
-      // set OMP_SCHEDULE = dynamic;
-#pragma omp for schedule(runtime)
-      for (i = 0; i < m; i++)
+      y[i] = 0.0;
+      for (j = i; j < n; j++)
       {
-         y[i] = 0.0;
-         for (j = i; j < n; j++)
-         {
-            temp = A[i * n + j] * x[j];
-            y[i] += temp;
-         }
+         temp = A[i * n + j] * x[j];
+         y[i] += temp;
       }
    }
 

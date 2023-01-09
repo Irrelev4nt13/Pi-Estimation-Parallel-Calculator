@@ -2,13 +2,12 @@
 CC=gcc
 
 #.o Files
-OBJS_0=omp_mat_vect_rand_split_original.o
+File_0=omp_mat_vect_rand_split_original.c
 
-OBJS_1=omp_mat_vect_rand_split_first_approach.o
+File_1=omp_mat_vect_rand_split_first_approach.c
 
-OBJS_2=omp_mat_vect_rand_split_second_approach.o
+File_2=omp_mat_vect_rand_split_second_approach.c
 
-OBJS_3=book.o
 
 #Executable
 EXEC_0=exe_0
@@ -20,24 +19,19 @@ EXEC_2=exe_2
 EXEC_3=exe_3
 
 #Parameters for run
-ARGS= 4 8000000 8
+ARGS= 4 8000 8000 1 100
 
-
-all: $(EXEC_0) $(EXEC_1) $(EXEC_2) $(EXEC_3)
+all: $(EXEC_0) $(EXEC_1) $(EXEC_2)
 
 #Create executable
-$(EXEC_0):$(OBJS_0)
-	$(CC) -g -Wall $(OBJS_0) -o $(EXEC_0) -fopenmp
+$(EXEC_0):$(File_0)
+	$(CC) -g -Wall -fopenmp -o $(EXEC_0) $(File_0) 
 
-$(EXEC_1):$(OBJS_1)
-	$(CC) -g -Wall $(OBJS_1) -o $(EXEC_1) -fopenmp
+$(EXEC_1):$(File_1)
+	$(CC) -g -Wall -fopenmp -o $(EXEC_1) $(File_1) 
 
-$(EXEC_2):$(OBJS_2)
-	$(CC) -g -Wall $(OBJS_2) -o $(EXEC_2) -fopenmp
-
-$(EXEC_3):$(OBJS_3)
-	$(CC) -g -Wall $(OBJS_3) -o $(EXEC_3) -fopenmp
-
+$(EXEC_2):$(File_2)
+	$(CC) -g -Wall -fopenmp -o $(EXEC_2) $(File_2) 
 
 original: $(EXEC_0)
 	./$(EXEC_0) $(ARGS)
@@ -48,8 +42,6 @@ first: $(EXEC_1)
 second: $(EXEC_2)
 	./$(EXEC_2) $(ARGS)
 
-third: $(EXEC_3)
-	./$(EXEC_3) $(ARGS)
 #Clear
 clean:
-	rm -f $(OBJS_0) $(OBJS_1) $(OBJS_2) $(OBJS_3) $(EXEC_0) $(EXEC_1) $(EXEC_2) $(EXEC_3)
+	rm -f $(EXEC_0) $(EXEC_1) $(EXEC_2)
