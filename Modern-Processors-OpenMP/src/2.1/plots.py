@@ -1,4 +1,4 @@
-# importing the required modules
+# importing the required module
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -10,7 +10,7 @@ thread = [0 for k in range(rows)]
 rows = 0
 cols = 0
 pic = [[0 for i in range(m)] for j in range(n)]
-with open('averages92.1.txt', 'r') as file:
+with open('outputs/averages8.txt', 'r') as file:
     for line in file:
         str = line.split()
         if len(str) == 0:
@@ -33,13 +33,15 @@ with open('averages92.1.txt', 'r') as file:
         # arr[0][cols] += float(str[3]) #For the excercise1.1
         # Array
         if rows == 1:
-            pic[0][cols] = float(str[2])
+            # pic[0][cols] = float(str[2])
             x[0][cols] = int(str[0])
-        pic[rows][cols] = float(str[4])
+        pic[rows][cols] = float(str[2])
+        pic[rows + int(n / 2)][cols] = float(str[4])
         cols += 1
 # for i in range(10): #For the excercise1.1
 #     arr[0][i] /= (n - 1)
 i = 0
+print(pic)
 plt.style.use('ggplot')
 for ls in arr:
     plt.plot(x[i], ls, label=thread[i], marker='o', linestyle=":", linewidth=2)

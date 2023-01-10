@@ -18,3 +18,5 @@
 !*.pdf
 !*.sh
 !*.py
+!*.docx
+!*.csv
