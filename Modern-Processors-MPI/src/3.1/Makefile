@@ -11,7 +11,7 @@ EXEC= exe
 ARGS= 1000000000
 
 #Processes
-proc=8
+proc=4
 
 #Create executable
 $(EXEC):$(Files)

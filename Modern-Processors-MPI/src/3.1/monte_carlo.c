@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include "../../include/my_rand.h"
-#include "../../include/timer.h"
 
 long long int monte_carlo();
 
@@ -31,7 +30,7 @@ int main(int argc, char *argv[])
         }
         throws = strtol(argv[1], NULL, 10);
     }
-    GET_TIME(start);
+    start = MPI_Wtime();
     MPI_Bcast(&throws, 1, MPI_LONG_LONG, 0, comm);
     local_throws = throws / comm_sz;
 
@@ -41,7 +40,8 @@ int main(int argc, char *argv[])
     if (my_rank == 0)
     {
         pi = 4 * arrows / (long double)throws;
-        GET_TIME(end);
+        end = MPI_Wtime();
+
         double duration = end - start;
         printf("%Lf %f\n", pi, duration);
     }

@@ -77,7 +77,7 @@ int main(void) {
 
    MPI_Barrier(comm);
    start = MPI_Wtime();
-   Mat_vect_mult(local_A, local_x, local_y, local_m, n, local_n, comm);
+   Mat_vect_mult(local_A, local_x, local_y, local_m, n, local_n, comm);/
    finish = MPI_Wtime();
    loc_elapsed = finish-start;
    MPI_Reduce(&loc_elapsed, &elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, comm);
