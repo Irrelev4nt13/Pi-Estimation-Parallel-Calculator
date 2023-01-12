@@ -32,12 +32,12 @@ int main(int argc, char *argv[])
         throws = strtol(argv[1], NULL, 10);
     }
     GET_TIME(start);
-    MPI_Bcast(&throws, 1, MPI_LONG_LONG_INT, 0, comm);
-    local_throws = throws;
-    seg = local_throws / comm_sz;
+    MPI_Bcast(&throws, 1, MPI_LONG_LONG, 0, comm);
+    local_throws = throws / comm_sz;
 
-    local_arrows = monte_carlo((my_rank + 1) * seg, my_rank * seg, my_rank + 1);
-    MPI_Reduce(&local_arrows, &arrows, 1, MPI_LONG_LONG_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+    local_arrows = monte_carlo((my_rank + 1) * local_throws, my_rank * local_throws, my_rank + 1);
+
+    MPI_Reduce(&local_arrows, &arrows, 1, MPI_LONG_LONG, MPI_SUM, 0, comm);
     if (my_rank == 0)
     {
         pi = 4 * arrows / (long double)throws;
@@ -54,8 +54,11 @@ long long int monte_carlo(long long int throws, long long int start, int id)
     unsigned seed = id, tmp;
     long long int my_arrows = 0, i;
     long double x, y;
+    // srandom(id);
     for (i = start; i < throws; i++)
     {
+        // x = 2 * random() / ((double)RAND_MAX) - 1.0;
+        // y = 2 * random() / ((double)RAND_MAX) - 1.0;
         x = -1 + 2 * my_drand(&seed);
         y = -1 + 2 * my_drand(&seed);
         long double distance = x * x + y * y;
