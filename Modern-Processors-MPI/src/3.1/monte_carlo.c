@@ -54,11 +54,8 @@ long long int monte_carlo(long long int throws, long long int start, int id)
     unsigned seed = id, tmp;
     long long int my_arrows = 0, i;
     long double x, y;
-    // srandom(id);
     for (i = start; i < throws; i++)
     {
-        // x = 2 * random() / ((double)RAND_MAX) - 1.0;
-        // y = 2 * random() / ((double)RAND_MAX) - 1.0;
         x = -1 + 2 * my_drand(&seed);
         y = -1 + 2 * my_drand(&seed);
         long double distance = x * x + y * y;

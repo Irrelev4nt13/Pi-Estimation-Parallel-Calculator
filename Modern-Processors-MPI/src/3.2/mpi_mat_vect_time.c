@@ -98,11 +98,7 @@ int main(void)
 } /* main */
 
 /*-------------------------------------------------------------------*/
-void Check_for_error(
-    int local_ok /* in */,
-    char fname[] /* in */,
-    char message[] /* in */,
-    MPI_Comm comm /* in */)
+void Check_for_error(int local_ok /* in */, char fname[] /* in */, char message[] /* in */, MPI_Comm comm /* in */)
 {
    int ok;
 
@@ -123,14 +119,7 @@ void Check_for_error(
 } /* Check_for_error */
 
 /*-------------------------------------------------------------------*/
-void Get_dims(
-    int *m_p /* out */,
-    int *local_m_p /* out */,
-    int *n_p /* out */,
-    int *local_n_p /* out */,
-    int my_rank /* in  */,
-    int comm_sz /* in  */,
-    MPI_Comm comm /* in  */)
+void Get_dims(int *m_p /* out */, int *local_m_p /* out */, int *n_p /* out */, int *local_n_p /* out */, int my_rank /* in  */, int comm_sz /* in  */, MPI_Comm comm /* in  */)
 {
    int local_ok = 1;
 
@@ -154,14 +143,7 @@ void Get_dims(
 } /* Get_dims */
 
 /*-------------------------------------------------------------------*/
-void Allocate_arrays(
-    double **local_A_pp /* out */,
-    double **local_x_pp /* out */,
-    double **local_y_pp /* out */,
-    int local_m /* in  */,
-    int n /* in  */,
-    int local_n /* in  */,
-    MPI_Comm comm /* in  */)
+void Allocate_arrays(double **local_A_pp /* out */, double **local_x_pp /* out */, double **local_y_pp /* out */, int local_m /* in  */, int n /* in  */, int local_n /* in  */, MPI_Comm comm /* in  */)
 {
 
    int local_ok = 1;
@@ -178,14 +160,7 @@ void Allocate_arrays(
 } /* Allocate_arrays */
 
 /*-------------------------------------------------------------------*/
-void Read_matrix(
-    char prompt[] /* in  */,
-    double local_A[] /* out */,
-    int m /* in  */,
-    int local_m /* in  */,
-    int n /* in  */,
-    int my_rank /* in  */,
-    MPI_Comm comm /* in  */)
+void Read_matrix(char prompt[] /* in  */, double local_A[] /* out */, int m /* in  */, int local_m /* in  */, int n /* in  */, int my_rank /* in  */, MPI_Comm comm /* in  */)
 {
    double *A = NULL;
    int local_ok = 1;
@@ -216,13 +191,7 @@ void Read_matrix(
 } /* Read_matrix */
 
 /*-------------------------------------------------------------------*/
-void Read_vector(
-    char prompt[] /* in  */,
-    double local_vec[] /* out */,
-    int n /* in  */,
-    int local_n /* in  */,
-    int my_rank /* in  */,
-    MPI_Comm comm /* in  */)
+void Read_vector(char prompt[] /* in  */, double local_vec[] /* out */, int n /* in  */, int local_n /* in  */, int my_rank /* in  */, MPI_Comm comm /* in  */)
 {
    double *vec = NULL;
    int i, local_ok = 1;
@@ -251,10 +220,7 @@ void Read_vector(
 } /* Read_vector */
 
 /*-------------------------------------------------------------------*/
-void Generate_matrix(
-    double local_A[] /* out */,
-    int local_m /* in  */,
-    int n /* in  */)
+void Generate_matrix(double local_A[] /* out */, int local_m /* in  */, int n /* in  */)
 {
    int i, j;
 
@@ -264,9 +230,7 @@ void Generate_matrix(
 } /* Generate_matrix */
 
 /*-------------------------------------------------------------------*/
-void Generate_vector(
-    double local_x[] /* out */,
-    int local_n /* in  */)
+void Generate_vector(double local_x[] /* out */, int local_n /* in  */)
 {
    int i;
 
@@ -275,14 +239,7 @@ void Generate_vector(
 } /* Generate_vector */
 
 /*-------------------------------------------------------------------*/
-void Print_matrix(
-    char title[] /* in */,
-    double local_A[] /* in */,
-    int m /* in */,
-    int local_m /* in */,
-    int n /* in */,
-    int my_rank /* in */,
-    MPI_Comm comm /* in */)
+void Print_matrix(char title[] /* in */, double local_A[] /* in */, int m /* in */, int local_m /* in */, int n /* in */, int my_rank /* in */, MPI_Comm comm /* in */)
 {
    double *A = NULL;
    int i, j, local_ok = 1;
@@ -316,13 +273,7 @@ void Print_matrix(
 } /* Print_matrix */
 
 /*-------------------------------------------------------------------*/
-void Print_vector(
-    char title[] /* in */,
-    double local_vec[] /* in */,
-    int n /* in */,
-    int local_n /* in */,
-    int my_rank /* in */,
-    MPI_Comm comm /* in */)
+void Print_vector(char title[] /* in */, double local_vec[] /* in */, int n /* in */, int local_n /* in */, int my_rank /* in */, MPI_Comm comm /* in */)
 {
    double *vec = NULL;
    int i, local_ok = 1;
