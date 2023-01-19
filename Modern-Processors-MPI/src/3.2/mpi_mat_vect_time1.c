@@ -65,10 +65,8 @@ int main(int argc, char *argv[])
 
    Get_dims(&m, &local_m, &n, &local_n, my_rank, comm_sz, comm, argv);
    Allocate_arrays(&local_A, &local_x, &local_y, local_m, n, local_n, comm);
-   //Read_matrix("A", local_A, m, local_m, n, my_rank, comm);
-   //Read_vector("x", local_x, n, local_n, my_rank, comm);
-   srandom(3);
-   
+   // Read_matrix("A", local_A, m, local_m, n, my_rank, comm);
+   srandom(my_rank + 3);
    Generate_matrix(local_A, local_m, n);
 #ifdef DEBUG
    Print_matrix("A", local_A, m, local_m, n, my_rank, comm);
@@ -233,6 +231,7 @@ void Generate_matrix(double local_A[] /* out */, int local_m /* in  */, int n /*
 void Generate_vector(double local_x[] /* out */, int local_n /* in  */)
 {
    int i;
+
    for (i = 0; i < local_n; i++)
       local_x[i] = ((double)random()) / ((double)RAND_MAX);
 } /* Generate_vector */
@@ -322,7 +321,17 @@ void Mat_vect_mult(
                    "Can't allocate temporary vector", comm);
    MPI_Allgather(local_x, local_n, MPI_DOUBLE,
                  x, local_n, MPI_DOUBLE, comm);
-
+               //      $ mpiexec -n 4 valgrind --leak-check=yes ./bin/mpi_mat_vect_time 10000 g
+   #ifdef DEBUG
+      printf("\n-------\n");
+      printf("DEBUG\n");
+      for (int i = 0; i < local_m; i++)
+      {
+         for (j = 0; j < n; j++)
+            printf("%f ", local_A[i * n + j]);
+      }
+      printf("\n-------\n");
+   #endif
    for (local_i = 0; local_i < local_m; local_i++)
    {
       local_y[local_i] = 0.0;
