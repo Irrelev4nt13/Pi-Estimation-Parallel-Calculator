@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 #endif
 
    if (my_rank == 0)
-      printf("Elapsed time = %f\n", elapsed);
+      printf("%f\n", elapsed);
 
    free(local_A);
    free(local_x);
