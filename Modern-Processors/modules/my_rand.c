@@ -19,6 +19,6 @@ unsigned my_rand(unsigned *seed_p)
 long double my_drand(unsigned *seed_p)
 {
     unsigned x = my_rand(seed_p);
-    long double y = -1 + 2 * x / MR_DIVISOR;
+    long double y = x / MR_DIVISOR;
     return y;
 }
