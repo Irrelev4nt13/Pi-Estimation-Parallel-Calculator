@@ -48,8 +48,19 @@ int         total_ops;
 double      insert_percent;
 double      search_percent;
 double      delete_percent;
-pthread_mutex_t     rwlock_mutex;
+pthread_mutex_t     rwlock;
 pthread_mutex_t     count_mutex;
+
+pthread_cond_t      read_c; 
+pthread_cond_t      write_c; 
+
+char        priority;
+int         count_reads = 0;
+int         count_writes = 0;
+int         count_waiting_reads = 0;
+int         count_waiting_writes = 0;
+
+
 int         member_count = 0, insert_count = 0, delete_count = 0;
 
 /* Setup and cleanup */
@@ -58,9 +69,9 @@ void        Get_input(int* inserts_in_main_p);
 
 /* Thread function */
 void*       Thread_work(void* rank);
-void       Thread_Member(void* rank, int value);
-void       Thread_Insert(void* rank, int value);
-void       Thread_Delete(void* rank, int value);
+void       Thread_Member(int value);
+void       Thread_Insert(int value);
+void       Thread_Delete(int value);
 
 /* List operations */
 int         Insert(int value);
@@ -79,9 +90,9 @@ int main(int argc, char* argv[]) {
    unsigned seed = 1;
    double start, finish;
 
-   if (argc != 2) Usage(argv[0]);
+   if (argc != 3) Usage(argv[0]);
    thread_count = strtol(argv[1],NULL,10);
-
+   priority=argv[2][0];
    Get_input(&inserts_in_main);
 
    /* Try to insert inserts_in_main keys, but give up after */
@@ -103,7 +114,7 @@ int main(int argc, char* argv[]) {
 
    thread_handles = malloc(thread_count*sizeof(pthread_t));
    pthread_mutex_init(&count_mutex, NULL);
-   pthread_rwlock_init(&rwlock, NULL);
+   pthread_mutex_init(&rwlock, NULL);
 
    GET_TIME(start);
    for (i = 0; i < thread_count; i++)
@@ -112,7 +123,7 @@ int main(int argc, char* argv[]) {
    for (i = 0; i < thread_count; i++)
       pthread_join(thread_handles[i], NULL);
    GET_TIME(finish);
-   printf("Elapsed time = %e seconds\n", finish - start);
+   printf("Elapsed time = %f seconds\n", finish - start);
    printf("Total ops = %d\n", total_ops);
    printf("member ops = %d\n", member_count);
    printf("insert ops = %d\n", insert_count);
@@ -125,7 +136,7 @@ int main(int argc, char* argv[]) {
 #  endif
 
    Free_list();
-   pthread_rwlock_destroy(&rwlock);
+   pthread_mutex_destroy(&rwlock);
    pthread_mutex_destroy(&count_mutex);
    free(thread_handles);
 
@@ -297,17 +308,17 @@ void* Thread_work(void* rank) {
       val = my_rand(&seed) % MAX_KEY;
       if (which_op < search_percent) 
       {
-         Thread_Member(my_rank, val);
+         Thread_Member( val);
          my_member_count++;
       }
       else if (which_op < search_percent + insert_percent) 
       {
-         Thread_insert(my_rank, val);
+         Thread_Insert( val);
          my_insert_count++;
       }
       else 
       {
-         Thread_delete(my_rank, val);
+         Thread_Delete( val);
          my_delete_count++;
       }
    }
@@ -322,38 +333,94 @@ void* Thread_work(void* rank) {
 }  /* Thread_work */
 
 
-void Thread_Member(void* rank, int value)
+void Thread_Member( int value)
 {
-   pthread_rwlock_rdlock(&rwlock);
+   pthread_mutex_lock(&rwlock);
+   while(count_writes != 0)
+   {
+      count_waiting_reads++;
+      while(pthread_cond_wait(&read_c, &rwlock) != 0);
+      count_waiting_reads--;
+   }
+   count_reads++;
+   pthread_mutex_unlock(&rwlock);
+
    Member(value);
-   pthread_rwlock_unlock(&rwlock);
+   
+   pthread_mutex_lock(&rwlock);
+   count_reads--;
+   
+   if(count_reads == 0 && count_waiting_writes != 0)
+      pthread_cond_signal(&write_c);
+   pthread_mutex_unlock(&rwlock);
    
 }
 
 
-void Thread_Insert(void* rank, int value) 
+void Thread_Insert( int value) 
 {
-   pthread_rwlock_wrlock(&rwlock);
+   pthread_mutex_lock(&rwlock);
+   while(count_reads != 0 || count_writes != 0)
+   {
+      count_waiting_writes++;
+      while(pthread_cond_wait(&write_c,&rwlock) != 0);
+      count_waiting_writes--;
+   }
+   count_writes++;
+   pthread_mutex_unlock(&rwlock);
+
    Insert(value);
-   pthread_rwlock_unlock(&rwlock);
    
+   pthread_mutex_lock(&rwlock);
+   count_writes--;
+   if(priority=='r')
+   {
+      if(count_waiting_reads != 0)
+         pthread_cond_broadcast(&read_c);
+      else if(count_waiting_writes != 0)
+         pthread_cond_signal(&write_c);
+   }
+   else
+   {
+      if(count_waiting_writes != 0)
+         pthread_cond_broadcast(&read_c);
+      else if(count_waiting_reads != 0)
+         pthread_cond_signal(&write_c);
+   }
+   pthread_mutex_unlock(&rwlock);
 }
 
 
-void Thread_Delete(void* rank, int value)
+void Thread_Delete( int value)
 {
-   pthread_rwlock_wrlock(&rwlock);
+   pthread_mutex_lock(&rwlock);
+   while(count_reads != 0 || count_writes != 0)
+   {
+      count_waiting_writes++;
+      while(pthread_cond_wait(&write_c,&rwlock) != 0);
+      count_waiting_writes--;
+   }
+   count_writes++;
+   pthread_mutex_unlock(&rwlock);
+
    Delete(value);
-   pthread_rwlock_unlock(&rwlock);
+   
+   pthread_mutex_lock(&rwlock);
+   count_writes--;
+   if(priority=='r')
+   {
+      if(count_waiting_reads != 0)
+         pthread_cond_broadcast(&read_c);
+      else if(count_waiting_writes != 0)
+         pthread_cond_signal(&write_c);
+   }
+   else
+   {
+      if(count_waiting_writes != 0)
+         pthread_cond_broadcast(&read_c);
+      else if(count_waiting_reads != 0)
+         pthread_cond_signal(&write_c);
+   }
+   pthread_mutex_unlock(&rwlock);
    
 }
-
-
-// int temp_reads = 0;
-// if ( temp_reads != reads_main)
-// {
-//  priotity read  
-// }
-// else 
-//    prioriry write
-   
