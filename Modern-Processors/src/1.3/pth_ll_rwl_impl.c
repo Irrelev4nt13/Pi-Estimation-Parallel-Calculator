@@ -354,7 +354,6 @@ void Thread_Member( int value)
    if(count_reads == 0 && count_waiting_writes != 0)
       pthread_cond_signal(&write_c);
    pthread_mutex_unlock(&rwlock);
-   
 }
 
 
@@ -384,9 +383,9 @@ void Thread_Insert( int value)
    else
    {
       if(count_waiting_writes != 0)
-         pthread_cond_broadcast(&read_c);
-      else if(count_waiting_reads != 0)
          pthread_cond_signal(&write_c);
+      else if(count_waiting_reads != 0)
+         pthread_cond_broadcast(&read_c);
    }
    pthread_mutex_unlock(&rwlock);
 }
@@ -418,9 +417,9 @@ void Thread_Delete( int value)
    else
    {
       if(count_waiting_writes != 0)
-         pthread_cond_broadcast(&read_c);
-      else if(count_waiting_reads != 0)
          pthread_cond_signal(&write_c);
+      else if(count_waiting_reads != 0)
+         pthread_cond_broadcast(&read_c);
    }
    pthread_mutex_unlock(&rwlock);
    
