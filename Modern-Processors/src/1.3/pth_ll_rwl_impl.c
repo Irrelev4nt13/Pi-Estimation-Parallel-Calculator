@@ -69,9 +69,8 @@ void        Get_input(int* inserts_in_main_p);
 
 /* Thread function */
 void*       Thread_work(void* rank);
-void       Thread_Member(int value);
-void       Thread_Insert(int value);
-void       Thread_Delete(int value);
+void       Thread_Reader(int value);
+void       Thread_Writer(int value,int operation);
 
 /* List operations */
 int         Insert(int value);
@@ -92,6 +91,11 @@ int main(int argc, char* argv[]) {
 
    if (argc != 3) Usage(argv[0]);
    thread_count = strtol(argv[1],NULL,10);
+   if(argv[2][0]!='r' && argv[2][0]!='w')
+   {
+      perror("Choose r for priority to readers or w for priority to writers as the second argument");
+      return 1;
+   }
    priority=argv[2][0];
    Get_input(&inserts_in_main);
 
@@ -309,17 +313,17 @@ void* Thread_work(void* rank) {
       val = my_rand(&seed) % MAX_KEY;
       if (which_op < search_percent) 
       {
-         Thread_Member( val);
+         Thread_Reader(val);
          my_member_count++;
       }
       else if (which_op < search_percent + insert_percent) 
       {
-         Thread_Insert( val);
+         Thread_Writer(val,0);
          my_insert_count++;
       }
       else 
       {
-         Thread_Delete( val);
+         Thread_Writer(val,1);
          my_delete_count++;
       }
    }
@@ -334,7 +338,7 @@ void* Thread_work(void* rank) {
 }  /* Thread_work */
 
 
-void Thread_Member( int value)
+void Thread_Reader( int value)
 {
    pthread_mutex_lock(&rwlock);
    while(count_writes != 0)
@@ -357,7 +361,7 @@ void Thread_Member( int value)
 }
 
 
-void Thread_Insert( int value) 
+void Thread_Writer( int value,int operation) 
 {
    pthread_mutex_lock(&rwlock);
    while(count_reads != 0 || count_writes != 0)
@@ -368,8 +372,10 @@ void Thread_Insert( int value)
    }
    count_writes++;
    pthread_mutex_unlock(&rwlock);
-
-   Insert(value);
+   if(operation==0)
+      Insert(value);
+   else
+      Delete(value);
    
    pthread_mutex_lock(&rwlock);
    count_writes--;
@@ -388,39 +394,4 @@ void Thread_Insert( int value)
          pthread_cond_broadcast(&read_c);
    }
    pthread_mutex_unlock(&rwlock);
-}
-
-
-void Thread_Delete( int value)
-{
-   pthread_mutex_lock(&rwlock);
-   while(count_reads != 0 || count_writes != 0)
-   {
-      count_waiting_writes++;
-      while(pthread_cond_wait(&write_c,&rwlock) != 0);
-      count_waiting_writes--;
-   }
-   count_writes++;
-   pthread_mutex_unlock(&rwlock);
-
-   Delete(value);
-   
-   pthread_mutex_lock(&rwlock);
-   count_writes--;
-   if(priority=='r')
-   {
-      if(count_waiting_reads != 0)
-         pthread_cond_broadcast(&read_c);
-      else if(count_waiting_writes != 0)
-         pthread_cond_signal(&write_c);
-   }
-   else
-   {
-      if(count_waiting_writes != 0)
-         pthread_cond_signal(&write_c);
-      else if(count_waiting_reads != 0)
-         pthread_cond_broadcast(&read_c);
-   }
-   pthread_mutex_unlock(&rwlock);
-   
 }

@@ -110,7 +110,6 @@ int main(int argc, char *argv[])
 void Get_args(int argc, char *argv[], int *thread_count_p,
               int *m_p, int *n_p, int *chunk_size, int *schedule_type)
 {
-
    if (argc != 6)
       Usage(argv[0]);
    *thread_count_p = strtol(argv[1], NULL, 10);
