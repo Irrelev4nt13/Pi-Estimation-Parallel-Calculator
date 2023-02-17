@@ -14,7 +14,7 @@ $(EXEC):$(Files)
 	$(CC) -g -Wall -fopenmp -o $(EXEC) $(Files) 
 
 run: $(EXEC)
-	./$(EXEC) 3 3 1 2
+	./$(EXEC) 3 3 1 2 0
 
 #Clear
 clean:

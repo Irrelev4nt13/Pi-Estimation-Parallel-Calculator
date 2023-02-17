@@ -6,7 +6,7 @@
 
 /* Serial functions */
 void Get_args(int argc, char *argv[], int *thread_count_p,
-              int *m_p, int *n_p, int *, int *);
+              int *m_p, int *n_p, int *, int *, int *);
 void Usage(char *prog_name);
 void Gen_matrix(int A[],int x[], int m, int n);
 void Read_matrix(char *prompt, int A[], int m, int n);
@@ -23,12 +23,12 @@ void cols(int A[],int b[],int x[],int n,int m,int thread_count, int schedule_typ
 int main(int argc, char *argv[])
 {
    int thread_count;
-   int m, n, chunk_size, schedule_type;
+   int m, n, chunk_size, schedule_type,row=0;
    int *A;
    int *b;
    int *x;
 
-   Get_args(argc, argv, &thread_count, &m, &n, &chunk_size, &schedule_type);
+   Get_args(argc, argv, &thread_count, &m, &n, &chunk_size, &schedule_type, &row);
    if (m % thread_count != 0)
    {
       fprintf(stdout, "m %% thread_count != 0\n");
@@ -38,7 +38,12 @@ int main(int argc, char *argv[])
    b = malloc(m * sizeof(int));
    x = malloc(n * sizeof(int));
   Gen_matrix(A, b, m, n);
-    cols(A,b,x,n,m,thread_count,schedule_type,chunk_size);
+
+    if(row == 1)
+      rows(A,b,x,n,m,thread_count,schedule_type,chunk_size);
+    else
+      cols(A,b,x,n,m,thread_count,schedule_type,chunk_size);
+
    Print_matrix("We read", A, m, n);
    Print_vector("The product is", b, m);
 #ifdef DEBUG
@@ -59,10 +64,10 @@ int main(int argc, char *argv[])
  * In args:   argc, argv
  * Out args:  thread_count_p, m_p, n_p
  */
-void Get_args(int argc, char *argv[], int *thread_count_p, int *m_p, int *n_p, int *chunk_size, int *schedule_type)
+void Get_args(int argc, char *argv[], int *thread_count_p, int *m_p, int *n_p, int *chunk_size, int *schedule_type, int *row)
 {
 
-   if (argc != 5)
+   if (argc != 6)
       Usage(argv[0]);
    *thread_count_p = strtol(argv[1], NULL, 10);
    *m_p = strtol(argv[2], NULL, 10);
@@ -79,7 +84,8 @@ void Get_args(int argc, char *argv[], int *thread_count_p, int *m_p, int *n_p, i
       fprintf(stderr, "The chunk size has to be positive\n");
       exit(0);
    }
-   if (*thread_count_p <= 0 || *m_p <= 0 || *n_p <= 0)
+   *row = strtol(argv[5], NULL, 10);
+   if (*thread_count_p <= 0 || *m_p <= 0 || *n_p <= 0 || *schedule_type<=0 || *schedule_type>4 || *row < 0 || *row > 1 )
       Usage(argv[0]);
 
 }/* Get_args */
@@ -92,7 +98,7 @@ void Get_args(int argc, char *argv[], int *thread_count_p, int *m_p, int *n_p, i
  */
 void Usage(char *prog_name)
 {
-   fprintf(stderr, "usage: %s <thread_count> <m> <n>\n", prog_name);
+   fprintf(stderr, "usage: %s <thread_count> <m> <n> <schedule_type> <chunk_size> <rows_implementation(0 or 1)>\n", prog_name);
    exit(0);
 } /* Usage */
 
@@ -209,8 +215,8 @@ void Print_vector(char *title, int b[], int m)
 
 void rows(int A[],int b[],int x[],int n,int m,int thread_count, int schedule_type, int chunk_size)
 {
-    int row,col,tmp;
-    
+   int row,col,tmp;
+   
    omp_set_schedule(schedule_type, chunk_size);
 #pragma omp parallel num_threads(thread_count) default(none) private(row,col) shared(A,b,x,n,tmp)
     for(row=n-1; row>=0; row--)
