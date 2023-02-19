@@ -138,7 +138,7 @@ void Gen_matrix(int A[],int b[], int m, int n)
         for (j = 0; j < n; j++)
         { 
             if (i <= j)
-                A[i * n + j] = random()*10 / ((int)RAND_MAX);
+                A[i * n + j] = random()*10 / ((int)RAND_MAX)+1;
             else
                A[i * n + j] = 0;
             b[i] += x[j]*A[i * n + j];
@@ -234,7 +234,6 @@ void rows(int A[],int b[],int x[],int n,int m,int thread_count, int schedule_typ
     #pragma omp single
         x[row]=tmp / A[n*row + row];
     }
-    exit(0);
 //    Print_matrix("We read", A, m, n);
 //    Print_vector("The product is", x, m);
 //    Print_vector("The product is", b, m);
