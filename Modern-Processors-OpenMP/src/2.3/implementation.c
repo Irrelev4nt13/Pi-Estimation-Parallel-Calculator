@@ -44,8 +44,8 @@ int main(int argc, char *argv[])
     else
       cols(A,b,x,n,m,thread_count,schedule_type,chunk_size);
 
-   Print_matrix("We read", A, m, n);
-   Print_vector("The product is", b, m);
+   // Print_matrix("We read", A, m, n);
+   // Print_vector("The product is", b, m);
 #ifdef DEBUG
 #else
 /* Print_vector("The product is", b, m); */
@@ -138,7 +138,7 @@ void Gen_matrix(int A[],int b[], int m, int n)
         for (j = 0; j < n; j++)
         { 
             if (i <= j)
-                A[i * n + j] = random()*10 / ((int)RAND_MAX);
+                A[i * n + j] = random()*10 / ((int)RAND_MAX)+1;
             else
                A[i * n + j] = 0;
             b[i] += x[j]*A[i * n + j];
@@ -217,7 +217,11 @@ void rows(int A[],int b[],int x[],int n,int m,int thread_count, int schedule_typ
 {
    int row,col,tmp;
    
-   omp_set_schedule(schedule_type, chunk_size);
+   if(schedule_type!=4)/* If its not auto */
+      omp_set_schedule(schedule_type, chunk_size);
+   else
+      omp_set_schedule(schedule_type,chunk_size=0);
+   
 #pragma omp parallel num_threads(thread_count) default(none) private(row,col) shared(A,b,x,n,tmp)
     for(row=n-1; row>=0; row--)
     {
@@ -226,10 +230,10 @@ void rows(int A[],int b[],int x[],int n,int m,int thread_count, int schedule_typ
     #pragma omp for reduction(+: tmp)  schedule(runtime)
         for(col= row+1; col<n; col++)
             tmp -= A[n*row + col] * x[col];
+      
     #pragma omp single
         x[row]=tmp / A[n*row + row];
     }
-    
 //    Print_matrix("We read", A, m, n);
 //    Print_vector("The product is", x, m);
 //    Print_vector("The product is", b, m);
@@ -241,8 +245,10 @@ void cols(int A[],int b[],int x[],int n,int m,int thread_count, int schedule_typ
 #pragma omp parallel for num_threads(thread_count) default(none) shared(A,b,x,n)
     for (int row = 0; row < n; row++)
         x[row] = b[row];
-    
-   omp_set_schedule(schedule_type, chunk_size);
+   if(schedule_type!=4)/* If its not auto */
+      omp_set_schedule(schedule_type, chunk_size);
+   else
+      omp_set_schedule(schedule_type,chunk_size=0);
 #pragma omp parallel num_threads(thread_count) default(none) shared(A,b,x,n)
     for (int col = n - 1; col >= 0; col--) {
         
