@@ -1,4 +1,4 @@
-**# importing the required module
+# importing the required module
 import pandas as pd
 import math
 
@@ -39,9 +39,6 @@ with open('Output_tests/output.txt', 'r') as file:
 
 df = pd.DataFrame([], ["Chunk size " + str(appp[i][0][3])])
 ls = [df]
-# for x in appp:
-#     print(x)
-# exit()
 i = 0
 k = 1
 for x in appp:
@@ -53,7 +50,6 @@ for x in appp:
         k = 2
     else:
         k = 1
-    print(k, x)
     if i != 16:
         for y in x:
             minim = min(y[0], y[1])

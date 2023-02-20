@@ -98,7 +98,7 @@ void Get_args(int argc, char *argv[], int *thread_count_p, int *m_p, int *n_p, i
  */
 void Usage(char *prog_name)
 {
-   fprintf(stderr, "usage: %s <thread_count> <m> <n> <schedule_type> <chunk_size> <rows_implementation(0 or 1)>\n", prog_name);
+   fprintf(stderr, "usage: %s <thread_count> <n> <schedule_type> <chunk_size> <rows_implementation(0 or 1)>\n", prog_name);
    exit(0);
 } /* Usage */
 
