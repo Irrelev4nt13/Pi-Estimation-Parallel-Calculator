@@ -39,17 +39,17 @@ int main(int argc, char *argv[])
    x = malloc(n * sizeof(int));
   Gen_matrix(A, b, m, n);
 
+   double start, finish, elapsed;
+
+   GET_TIME(start);
     if(row == 1)
       rows(A,b,x,n,m,thread_count,schedule_type,chunk_size);
     else
       cols(A,b,x,n,m,thread_count,schedule_type,chunk_size);
 
-   // Print_matrix("We read", A, m, n);
-   // Print_vector("The product is", b, m);
-#ifdef DEBUG
-#else
-/* Print_vector("The product is", b, m); */
-#endif
+   GET_TIME(finish);
+   elapsed = finish - start;
+   printf("%f\n", elapsed);
 
    free(A);
    free(x);
@@ -234,9 +234,6 @@ void rows(int A[],int b[],int x[],int n,int m,int thread_count, int schedule_typ
     #pragma omp single
         x[row]=tmp / A[n*row + row];
     }
-//    Print_matrix("We read", A, m, n);
-//    Print_vector("The product is", x, m);
-//    Print_vector("The product is", b, m);
 }
 
 
@@ -249,6 +246,7 @@ void cols(int A[],int b[],int x[],int n,int m,int thread_count, int schedule_typ
       omp_set_schedule(schedule_type, chunk_size);
    else
       omp_set_schedule(schedule_type,chunk_size=0);
+      
 #pragma omp parallel num_threads(thread_count) default(none) shared(A,b,x,n)
     for (int col = n - 1; col >= 0; col--) {
         
